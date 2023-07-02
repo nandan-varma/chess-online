@@ -86,7 +86,7 @@ export default function ChessGame() {
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" , height: "10vh"}}>
       <FontAwesomeIcon className='menu-icon' onClick={handleResetClick} icon={faRotate} />
       <FontAwesomeIcon className='menu-icon' onClick={handleUndoClick} icon={faRotateLeft} />
-      <FontAwesomeIcon className='menu-icon' onClick={handleRedoClick} icon={faRotateRight} />
+      {/* <FontAwesomeIcon className='menu-icon' onClick={handleRedoClick} icon={faRotateRight} /> */}
       <FontAwesomeIcon className='menu-icon' icon={faChartMixed} />
       </div>
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" , color : "white" }}>
