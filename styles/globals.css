@@ -7,7 +7,7 @@ html{
   background-color: black;
 }
 
-/* .bgimage{
+.bgimage{
   z-index : -50;
   position: absolute;
   height: 100vh;
@@ -16,24 +16,6 @@ html{
   background-repeat: no-repeat;
   background-size: cover;
   filter: blur(5px);
-} */
-
-.mainpage{
-  display: flex;
-  flex-direction: column;
-}
-
-.mainpage button{
-  background-color: whitesmoke;
-  cursor: pointer;
-  font-size: larger;
-  margin: 2vh 40vw;
-  width: 14rem;
-  height: 4rem;
-  font-weight: bolder;
-  border: 2rem solid gey;
-  border-radius: 24px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .menu-icon{

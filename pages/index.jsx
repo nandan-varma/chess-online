@@ -1,24 +1,61 @@
-import Link from "next/link"
+import React from "react";
+import Link from "next/link";
+import NavBar from "../components/NavBar";
+import Footer from "../components/Footer";
+import Button from "@mui/material/Button";
 
 function revisedRandId() {
-  return Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 10);
+  return Math.random().toString(36).replace(/[^a-z]+/g, "").substr(2, 10);
 }
 
-export default function Index(){
+const buttonStyle = {
+  padding: "2rem",
+  width: "20rem"
+}
+
+const Index = () => {
   return (
     <>
-    <div className="bgimage"></div>
-    <div className="mainpage">
-    <Link href={"/login"}><button>Log In</button></Link>
-    <br></br><br></br>    
-    <Link href={"/signup"}><button>Sign Up</button></Link>
-    <br></br><br></br>    
-    <Link href={"/vsAI"}><button>Play with AI</button></Link>
-    <br></br><br></br>
-    <Link href={"/"+revisedRandId()}><button>Play with friend</button></Link>
-    <br></br><br></br>
-    <Link href={"/board"}><button>Play Over Board</button></Link>
-    </div>
+      <NavBar />
+
+      <div
+        style={{
+          backgroundSize: "cover",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            padding: "20px",
+          }}
+        >
+          <Button style={buttonStyle} variant="contained" color="primary" component={Link} href={"/vsAI"}>
+            Play with AI
+          </Button>
+          <br />
+          <br />
+          <Button
+            style={buttonStyle}
+            variant="contained"
+            color="primary"
+            component={Link}
+            href={"/" + revisedRandId()}
+          >
+            Play with friend
+          </Button>
+          <br />
+          <br />
+          <Button style={buttonStyle} variant="contained" color="primary" component={Link} href={"/board"}>
+            Play Over Board
+          </Button>
+        </div>
+      </div>
     </>
-  )
-}
+  );
+};
+
+export default Index;

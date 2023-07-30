@@ -26,7 +26,7 @@ export default function ChessGame() {
       engine.move(move.from, move.to)
       setSquareStyles({})
       const moveCoord = engine.aiMove();
-      console.log(moveCoord)
+      // console.log(moveCoord)
       move = { from: Object.keys(moveCoord)[0].toLowerCase(), to: moveCoord[Object.keys(moveCoord)[0]].toLowerCase() }
       game.move(move)
       setFen(game.fen());
