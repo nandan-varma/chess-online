@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-  margin : 0;
-  padding: 0;
-}
-
-html{
-  background-color: black;
-}
-
-
 @layer base {
   :root {
     --background : 0 0% 100%;

@@ -1,8 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import NavBar from "../components/NavBar";
-import Footer from "../components/Footer";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
+import Footer from '@/components/Footer'
 
 function revisedRandId() {
   return Math.random().toString(36).replace(/[^a-z]+/g, "").substr(2, 10);
@@ -12,8 +11,7 @@ function revisedRandId() {
 const Index = () => {
   return (
     <>
-      <NavBar />
-      <div className="flex flex-col justify-center items-center min-h-screen bg-cover p-5 gap-5">
+      <div className="flex flex-col justify-center items-center min-h-screen bg-cover p-5 gap-5 bg-gray-900">
         <Link href="/vsAI">
           <Button variant={"outline"}>
             Play with AI
@@ -29,8 +27,8 @@ const Index = () => {
             Play Over Board
           </Button>
         </Link>
+        <Footer />
       </div>
-      <Footer />
     </>
   );
 };
