@@ -1,12 +1,13 @@
-import dynamic from 'next/dynamic';
+"use client"
+
 import { useState } from 'react';
 import { Chess } from 'chess.js';
 import { Game } from 'js-chess-engine';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartMixed, faRotate, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link';
 import ChessBoardLogic from '@/components/ChessBoard';
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function ChessGame() {
   const [fen, setFen] = useState('start');
@@ -25,6 +26,19 @@ export default function ChessGame() {
       const aiMoveFormatted = formatMove(aiMove);
       game.move(aiMoveFormatted);
       setFen(game.fen());
+      if (game.isCheckmate()) {
+        toast("You lost!", {
+          description: "Checkmate.",
+        });
+      } else if (game.isDraw()) {
+        toast("Draw!", {
+          description: "The game is a draw.",
+        });
+      }
+    } else {
+      toast("Invalid move!", {
+        description: "Please make a valid move.",
+      });
     }
   };
 
