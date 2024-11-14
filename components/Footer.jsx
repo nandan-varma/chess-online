@@ -11,7 +11,9 @@ const Footer = () => {
         alignItems: "center",
         height: "100px",
         backgroundColor: "#f5f5f5",
-        marginTop: "auto",
+        width: "100%",
+        position: "fixed",
+        bottom: "0",
       }}
     >
       <Typography variant="body2" color="textSecondary">
