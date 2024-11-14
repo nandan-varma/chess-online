@@ -35,7 +35,7 @@ const NavBar = () => {
   return (
     <AppBar className="w-full rounded-none" position="static">
       <Toolbar className="flex justify-between">
-        <Typography variant="h6">Chess Online</Typography>
+        <Link href={"/"}><h1>Chess Online</h1></Link>
         <div>
           {user ? (
             <DropdownMenu>

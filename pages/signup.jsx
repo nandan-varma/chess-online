@@ -35,7 +35,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle>Signup</CardTitle>

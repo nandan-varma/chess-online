@@ -21,7 +21,6 @@ export default function ChessGame() {
   const [game, setGame] = useState(new Chess());
   const [fen, setFen] = useState(game.fen());
   const [squareStyles, setSquareStyles] = useState({});
-  const [undoneMove, setUndoneMove] = useState(null);
   const ref = db.ref(`games/${slug}`);
   const [color, setColor] = useState('b');
   const [userId, setUserId] = useState(null);
@@ -31,6 +30,7 @@ export default function ChessGame() {
       if (user) {
         setUserId(user.uid);
       } else {
+        toast("Please log in to play with friends.");
         router.push('/login');
       }
     });
@@ -49,9 +49,15 @@ export default function ChessGame() {
           if (gameData.createdBy === userId) {
             setColor('w');
           }
+          else {
+            setColor('b');
+            ref.update({ opponent: userId });
+            toast("You joined the game and ready to play.");
+          }
         } else {
-          ref.set({ id: slug, FEN: fen, createdBy: userId });
+          ref.set({ id: slug, FEN: fen, createdBy: userId , opponent: null });
           setColor('w');
+          toast("Waiting for opponent to join the game.");
         }
       });
     }
@@ -130,12 +136,9 @@ export default function ChessGame() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white p-4">
       <title>Chess</title>
       <div className="flex justify-center items-center h-10vh space-x-4">
-        <Button onClick={handleResetClick}>
-          <FontAwesomeIcon icon={faRotate} />
-        </Button>
       </div>
       <div className="flex justify-center items-center h-80vh">
         <ChessBoardLogic
