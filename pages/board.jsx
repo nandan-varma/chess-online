@@ -5,8 +5,8 @@ import { Game } from 'js-chess-engine';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotate, faRotateLeft, faRotateRight } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-import ChessBoardLogic from '../components/ChessBoard';
-import { Button } from "../components/ui/button";
+import ChessBoardLogic from '@/components/ChessBoard';
+import { Button } from "@/components/ui/button";
 
 const Chessboard = dynamic(
   () => import('chessboardjsx'),

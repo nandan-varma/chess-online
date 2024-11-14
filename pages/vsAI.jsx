@@ -5,8 +5,8 @@ import { Game } from 'js-chess-engine';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartMixed, faRotate, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-import ChessBoardLogic from '../components/ChessBoard';
-import { Button } from "../components/ui/button";
+import ChessBoardLogic from '@/components/ChessBoard';
+import { Button } from "@/components/ui/button";
 
 export default function ChessGame() {
   const [fen, setFen] = useState('start');

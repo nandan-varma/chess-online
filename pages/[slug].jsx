@@ -7,9 +7,9 @@ import 'firebase/auth';
 import { Chess } from 'chess.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotate } from '@fortawesome/free-solid-svg-icons';
-import Link from 'next/link';
-import ChessBoardLogic from '../components/ChessBoard';
-import { Button } from "../components/ui/button";
+import ChessBoardLogic from '@/components/ChessBoard';
+import CopyToClipboard from '@/components/CopyToClipboard';
+import { Button } from "@/components/ui/button";
 
 const Chessboard = dynamic(
     () => import('chessboardjsx'),
@@ -31,7 +31,7 @@ export default function ChessGame() {
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        firebase.auth().onAuthStateChanged(function(user) {
+        firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 setUserId(user.uid);
             } else {
@@ -135,7 +135,7 @@ export default function ChessGame() {
                     onMouseOverSquare={onMouseOverSquare}
                     onDrop={(move) => {
                         const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare).type === 'p') ||
-                                            (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
+                            (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
                         if (isPromotion) {
                             handlePromotion(move.sourceSquare, move.targetSquare);
                         } else {
@@ -143,6 +143,9 @@ export default function ChessGame() {
                         }
                     }}
                 />
+            </div>
+            <div>
+                <CopyToClipboard link={"/"+slug} />
             </div>
         </div>
     )
