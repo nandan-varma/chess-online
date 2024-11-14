@@ -1,127 +1,115 @@
 import dynamic from 'next/dynamic';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { Chess } from 'chess.js';
-import { Game, move, status, moves, aiMove, getFen } from 'js-chess-engine'
-import {FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartMixed, faRotate, faRotateLeft, faRotateRight } from '@fortawesome/free-solid-svg-icons'
-// import Chessboard from 'chessboardjsx';
-const Chessboard = dynamic(
-  () => import('chessboardjsx'),
-  { ssr: false }
-)
+import { Game } from 'js-chess-engine';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChartMixed, faRotate, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
+import ChessBoardLogic from '../components/ChessBoard';
+import { Button } from "../components/ui/button";
 
 export default function ChessGame() {
   const [fen, setFen] = useState('start');
   const [game, setGame] = useState(new Chess());
   const [engine, setEngine] = useState(new Game());
   const [squareStyles, setSquareStyles] = useState({});
-  const [UnddoneMove, setUndoneMove] = useState(null)
+  const [undoneMove, setUndoneMove] = useState(null);
 
   const handleMove = (move) => {
-    if (game.moves({ square: move.from, verbose: true }).some(obj => obj.to == move.to && obj.from == move.from)) {
-      game.move(move)
+    if (isValidMove(move)) {
+      game.move(move);
       setFen(game.fen());
-      console.log(move)
-      //   move = {from : move.from.toUpperCase(), to : move.to.toUpperCase()}
-      engine.move(move.from, move.to)
-      setSquareStyles({})
-      const moveCoord = engine.aiMove();
-      // console.log(moveCoord)
-      move = { from: Object.keys(moveCoord)[0].toLowerCase(), to: moveCoord[Object.keys(moveCoord)[0]].toLowerCase() }
-      game.move(move)
+      engine.move(move.from, move.to);
+      setSquareStyles({});
+      const aiMove = engine.aiMove();
+      const aiMoveFormatted = formatMove(aiMove);
+      game.move(aiMoveFormatted);
       setFen(game.fen());
     }
-  }
+  };
 
+  const isValidMove = (move) => {
+    return game.moves({ square: move.from, verbose: true }).some(obj => obj.to === move.to && obj.from === move.from);
+  };
+
+  const formatMove = (moveCoord) => {
+    const from = Object.keys(moveCoord)[0].toLowerCase();
+    const to = moveCoord[Object.keys(moveCoord)[0]].toLowerCase();
+    return { from, to };
+  };
 
   const handlePromotion = (sourceSquare, targetSquare) => {
-    const promotionPiece = prompt('Choose a promotion piece (queen : q , rook : r, bishop : b, knight : n)', 'q');
-    handleMove({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: promotionPiece
-    });
-  }
+    const promotionPiece = prompt('Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)', 'q');
+    handleMove({ from: sourceSquare, to: targetSquare, promotion: promotionPiece });
+  };
 
-  const onMouseOverSquare = (square, piece) => {
-    var moves = game.moves({
-      square: square,
-      verbose: true
-    })
-    if (moves.length === 0) return
-    greySquare(square)
-    setSquareStyles({})
-    for (var i = 0; i < moves.length; i++) {
-      greySquare(moves[i].to)
-    }
-  }
+  const onMouseOverSquare = (square) => {
+    const moves = game.moves({ square, verbose: true });
+    if (moves.length === 0) return;
+    greySquare(square);
+    setSquareStyles({});
+    moves.forEach(move => greySquare(move.to));
+  };
 
   const greySquare = (square) => {
     setSquareStyles((prevStyles) => ({
       ...prevStyles,
       [square]: {
         background: 'radial-gradient(circle, white 36%, transparent 40%)',
-        borderRadius: '50%'
-      }
+        borderRadius: '50%',
+      },
     }));
-  }
+  };
+
   const handleResetClick = () => {
     game.reset();
     setFen(game.fen());
-    setEngine(new Game(game.fen()))
-  }
+    setEngine(new Game(game.fen()));
+  };
+
   const handleUndoClick = () => {
-    game.undo()
-    setUndoneMove(game.undo())
+    game.undo();
+    setUndoneMove(game.undo());
     setFen(game.fen());
-    setEngine(new Game(game.fen()))
-  }
+    setEngine(new Game(game.fen()));
+  };
+
   const handleRedoClick = () => {
-    handleMove(UnddoneMove)
-  }
+    if (undoneMove) {
+      handleMove(undoneMove);
+    }
+  };
 
   return (
-    <div>
+    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
       <title>Chess</title>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" , height: "10vh"}}>
-      <FontAwesomeIcon className='menu-icon' onClick={handleResetClick} icon={faRotate} />
-      <FontAwesomeIcon className='menu-icon' onClick={handleUndoClick} icon={faRotateLeft} />
-      {/* <FontAwesomeIcon className='menu-icon' onClick={handleRedoClick} icon={faRotateRight} /> */}
-      <FontAwesomeIcon className='menu-icon' icon={faChartMixed} />
+      <div className="flex justify-center items-center h-10vh space-x-4">
+        <Button onClick={handleResetClick}>
+          <FontAwesomeIcon icon={faRotate} />
+        </Button>
+        <Button onClick={handleUndoClick}>
+          <FontAwesomeIcon icon={faRotateLeft} />
+        </Button>
+        <Button>
+          <FontAwesomeIcon icon={faChartMixed} />
+        </Button>
       </div>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" , color : "white" }}>
-      <Chessboard 
-      calcWidth={({ screenWidth, screenHeight }) => screenHeight * 0.8}
-      boardStyle={{
-        borderRadius: "5px",
-        boxShadow: `0 5px 15px rgba(255, 255, 255, 0.5)`
-      }}
-        className={'chessboard'}
-        position={fen}
-        squareStyles={squareStyles}
-        onMouseOverSquare={onMouseOverSquare}
-        onDrop={(move) => {
-          if (
-            move.sourceSquare[1] === '7' &&
-            move.targetSquare[1] === '8' &&
-            game.get(move.sourceSquare).type === 'p'
-          ) {
-            handlePromotion(move.sourceSquare, move.targetSquare);
-          } else if (
-            move.sourceSquare[1] === '2' &&
-            move.targetSquare[1] === '1' &&
-            game.get(move.sourceSquare).type === 'p'
-          ) {
-            handlePromotion(move.sourceSquare, move.targetSquare);
-          } else {
-            handleMove({
-              from: move.sourceSquare,
-              to: move.targetSquare
-            });
-          }
-        }}
-      />
+      <div className="flex justify-center items-center h-80vh">
+        <ChessBoardLogic
+          fen={fen}
+          squareStyles={squareStyles}
+          onMouseOverSquare={onMouseOverSquare}
+          onDrop={(move) => {
+            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare).type === 'p') ||
+                                (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
+            if (isPromotion) {
+              handlePromotion(move.sourceSquare, move.targetSquare);
+            } else {
+              handleMove({ from: move.sourceSquare, to: move.targetSquare });
+            }
+          }}
+        />
       </div>
     </div>
-  )
+  );
 }

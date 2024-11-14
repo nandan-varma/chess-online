@@ -1,13 +1,16 @@
 import dynamic from 'next/dynamic';
-import { use, useState, useEffect } from 'react';
-import { useRouter } from 'next/router'
-import firebase from '../lib/firebase'
-import 'firebase/database'
-import 'firebase/auth'
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import firebase from '../lib/firebase';
+import 'firebase/database';
+import 'firebase/auth';
 import { Chess } from 'chess.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotate, faRotateLeft, faRotateRight } from '@fortawesome/free-solid-svg-icons'
-// import Chessboard from 'chessboardjsx';
+import { faRotate } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
+import ChessBoardLogic from '../components/ChessBoard';
+import { Button } from "../components/ui/button";
+
 const Chessboard = dynamic(
     () => import('chessboardjsx'),
     { ssr: false }
@@ -22,81 +25,84 @@ export default function ChessGame() {
     const [game, setGame] = useState(new Chess());
     const [fen, setFen] = useState(game.fen());
     const [squareStyles, setSquareStyles] = useState({});
-    const [UnddoneMove, setUndoneMove] = useState(null)
+    const [undoneMove, setUndoneMove] = useState(null);
     const ref = db.ref(`games/${slug}`);
     const [color, setColor] = useState('b');
-    var userid = null;
-    firebase.auth().onAuthStateChanged(function(user) {
-        if (user) {
-          userid = user.uid;
-        } else {
-          return <div>Try logging in to continue the game</div>
-        }
-      });
-    
+    const [userId, setUserId] = useState(null);
+
     useEffect(() => {
-        if (slug) {
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                setUserId(user.uid);
+            } else {
+                router.push('/login');
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        if (slug && userId) {
             ref.on('value', (snapshot) => {
                 if (snapshot.exists()) {
-                    setData(snapshot.val());
-                    // if(snapshot.val().createdBy == userid){setColor('w')}
+                    const gameData = snapshot.val();
+                    setData(gameData);
+                    if (gameData.FEN) {
+                        setFen(gameData.FEN);
+                        game.load(gameData.FEN);
+                    }
+                    if (gameData.createdBy === userId) {
+                        setColor('w');
+                    }
                 } else {
-                    ref.set({ id: slug, FEN: fen , createdBy : userid });
+                    ref.set({ id: slug, FEN: fen, createdBy: userId });
                     setColor('w');
                 }
             });
         }
-    }, [slug]);
+    }, [slug, userId]);
+
     useEffect(() => {
         if (data) {
-            game.load(data.FEN)
-            setFen(game.fen());
             ref.on('child_changed', (snapshot) => {
                 setData((prevData) => ({
                     ...prevData,
                     [snapshot.key]: snapshot.val(),
                 }));
+                if (snapshot.val().FEN) {
+                    game.load(snapshot.val().FEN);
+                    setFen(game.fen());
+                }
             });
         }
     }, [data, slug]);
 
     const handleMove = (move) => {
-        if (game.turn() == color) {
-            if (game.moves({ square: move.from, verbose: true }).some(obj => obj.to == move.to && obj.from == move.from)) {
-                game.move(move)
-                console.log(move)
-                setSquareStyles({})
+        if (game.turn() === color) {
+            if (game.moves({ square: move.from, verbose: true }).some(obj => obj.to === move.to && obj.from === move.from)) {
+                game.move(move);
+                setSquareStyles({});
                 ref.set({ id: slug, FEN: game.fen() });
             }
-            console.log(color)
         }
-    }
-
+    };
 
     const handlePromotion = (sourceSquare, targetSquare) => {
-        const promotionPiece = prompt('Choose a promotion piece (queen : q , rook : r, bishop : b, knight : n)', 'q');
+        const promotionPiece = prompt('Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)', 'q');
         handleMove({
             from: sourceSquare,
             to: targetSquare,
             promotion: promotionPiece
         });
-    }
+    };
 
-    const onMouseOverSquare = (square, piece) => {
-        if (game.turn() != color) {
-            return
-        }
-        var moves = game.moves({
-            square: square,
-            verbose: true
-        })
-        if (moves.length === 0) return
-        greySquare(square)
-        setSquareStyles({})
-        for (var i = 0; i < moves.length; i++) {
-            greySquare(moves[i].to)
-        }
-    }
+    const onMouseOverSquare = (square) => {
+        if (game.turn() !== color) return;
+        const moves = game.moves({ square, verbose: true });
+        if (moves.length === 0) return;
+        greySquare(square);
+        setSquareStyles({});
+        moves.forEach(move => greySquare(move.to));
+    };
 
     const greySquare = (square) => {
         setSquareStyles((prevStyles) => ({
@@ -106,54 +112,37 @@ export default function ChessGame() {
                 borderRadius: '50%'
             }
         }));
-    }
-    const handleResetClick = () => {
-        console.log(game.turn());
-        console.log(color);
-        // game.reset();
-        // setFen(game.fen());
-    }
-    return (
-        <div>
-            <title>Chess</title>
-            {/* <div className='game-id'>Game ID : {data["id"] } </div> */}
-            {/* <div>
-                {data ? (
-                    <div>Found Room: {JSON.stringify(data)}</div>
-                ) : (
-                    <div>Creating game room...</div>
-                )}
-            </div> */}
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" , height: "10vh"}}>
-            <FontAwesomeIcon className='menu-icon' onClick={handleResetClick} icon={faRotate} />
-            </div>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
+    };
 
-            <Chessboard
-                position={fen}
-                squareStyles={squareStyles}
-                onMouseOverSquare={onMouseOverSquare}
-                onDrop={(move) => {
-                    if (
-                        move.sourceSquare[1] === '7' &&
-                        move.targetSquare[1] === '8' &&
-                        game.get(move.sourceSquare).type === 'p'
-                    ) {
-                        handlePromotion(move.sourceSquare, move.targetSquare);
-                    } else if (
-                        move.sourceSquare[1] === '2' &&
-                        move.targetSquare[1] === '1' &&
-                        game.get(move.sourceSquare).type === 'p'
-                    ) {
-                        handlePromotion(move.sourceSquare, move.targetSquare);
-                    } else {
-                        handleMove({
-                            from: move.sourceSquare,
-                            to: move.targetSquare
-                        });
-                    }
-                }}
-            />
+    const handleResetClick = () => {
+        game.reset();
+        setFen(game.fen());
+        ref.set({ id: slug, FEN: game.fen(), createdBy: userId });
+    };
+
+    return (
+        <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
+            <title>Chess</title>
+            <div className="flex justify-center items-center h-10vh space-x-4">
+                <Button onClick={handleResetClick}>
+                    <FontAwesomeIcon icon={faRotate} />
+                </Button>
+            </div>
+            <div className="flex justify-center items-center h-80vh">
+                <ChessBoardLogic
+                    fen={fen}
+                    squareStyles={squareStyles}
+                    onMouseOverSquare={onMouseOverSquare}
+                    onDrop={(move) => {
+                        const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare).type === 'p') ||
+                                            (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
+                        if (isPromotion) {
+                            handlePromotion(move.sourceSquare, move.targetSquare);
+                        } else {
+                            handleMove({ from: move.sourceSquare, to: move.targetSquare });
+                        }
+                    }}
+                />
             </div>
         </div>
     )

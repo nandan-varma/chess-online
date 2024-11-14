@@ -2,58 +2,35 @@ import React from "react";
 import Link from "next/link";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-import Button from "@mui/material/Button";
+import { Button } from "../components/ui/button";
 
 function revisedRandId() {
   return Math.random().toString(36).replace(/[^a-z]+/g, "").substr(2, 10);
 }
 
-const buttonStyle = {
-  padding: "2rem",
-  width: "20rem"
-}
 
 const Index = () => {
   return (
     <>
       <NavBar />
-
-      <div
-        style={{
-          backgroundSize: "cover",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            padding: "20px",
-          }}
-        >
-          <Button style={buttonStyle} variant="contained" color="primary" component={Link} href={"/vsAI"}>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-cover p-5 gap-5">
+        <Link href="/vsAI">
+          <Button variant={"outline"}>
             Play with AI
           </Button>
-          <br />
-          <br />
-          <Button
-            style={buttonStyle}
-            variant="contained"
-            color="primary"
-            component={Link}
-            href={"/" + revisedRandId()}
-          >
+        </Link>
+        <Link href={"/" + revisedRandId()}>
+          <Button variant={"outline"}>
             Play with friend
           </Button>
-          <br />
-          <br />
-          <Button style={buttonStyle} variant="contained" color="primary" component={Link} href={"/board"}>
+        </Link>
+        <Link href="/board">
+          <Button variant={"outline"}>
             Play Over Board
           </Button>
-        </div>
+        </Link>
       </div>
+      <Footer />
     </>
   );
 };

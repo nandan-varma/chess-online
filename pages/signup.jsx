@@ -1,54 +1,77 @@
 import { useState } from 'react';
-import firebase from '../lib/firebase'
+import firebase from '../lib/firebase';
 import 'firebase/auth';
 import { useRouter } from 'next/router';
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Link from 'next/link';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-    const router = useRouter()
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // handle form submission using firebase authentication
+  const router = useRouter();
+
+  const handleSignup = () => {
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
-        // Signed in
         var user = userCredential.user;
         router.push('/');
-        // ...
       })
       .catch((error) => {
-        var errorCode = error.code;
         var errorMessage = error.message;
-        // ...
+        alert(errorMessage);
       });
   };
 
   return (
-    <div>
-      <h1>Signup</h1>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"></link>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <br />
-        <label htmlFor="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <br />
-        <button type="submit">Signup</button>
-      </form>
+    <div className="flex items-center justify-center min-h-screen">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Signup</CardTitle>
+          <CardDescription>Create your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid w-full items-center gap-4">
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                type="email"
+                id="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                type="password"
+                id="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-between">
+          <Link href="/" passHref>
+            <Button variant="outline">Cancel</Button>
+          </Link>
+          <Button onClick={handleSignup}>Signup</Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

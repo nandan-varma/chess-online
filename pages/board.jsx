@@ -1,10 +1,13 @@
 import dynamic from 'next/dynamic';
-import { use, useState } from 'react';
+import { useState } from 'react';
 import { Chess } from 'chess.js';
-import { Game, move, status, moves, aiMove, getFen } from 'js-chess-engine'
+import { Game } from 'js-chess-engine';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotate, faRotateLeft, faRotateRight } from '@fortawesome/free-solid-svg-icons'
-// import Chessboard from 'chessboardjsx';
+import { faRotate, faRotateLeft, faRotateRight } from '@fortawesome/free-solid-svg-icons';
+import Link from 'next/link';
+import ChessBoardLogic from '../components/ChessBoard';
+import { Button } from "../components/ui/button";
+
 const Chessboard = dynamic(
   () => import('chessboardjsx'),
   { ssr: false }
@@ -15,38 +18,32 @@ export default function ChessGame() {
   const [game, setGame] = useState(new Chess());
   const [engine, setEngine] = useState(new Game());
   const [squareStyles, setSquareStyles] = useState({});
-  const [UnddoneMove, setUndoneMove] = useState(null)
+  const [undoneMove, setUndoneMove] = useState(null);
 
   const handleMove = (move) => {
-    if (game.moves({ square: move.from, verbose: true }).some(obj => obj.to == move.to && obj.from == move.from)) {
-      game.move(move)
+    if (isValidMove(move)) {
+      game.move(move);
       setFen(game.fen());
-      setSquareStyles({})
+      setSquareStyles({});
     }
-  }
+  };
 
+  const isValidMove = (move) => {
+    return game.moves({ square: move.from, verbose: true }).some(obj => obj.to === move.to && obj.from === move.from);
+  };
 
   const handlePromotion = (sourceSquare, targetSquare) => {
-    const promotionPiece = prompt('Choose a promotion piece (queen : q , rook : r, bishop : b, knight : n)', 'q');
-    handleMove({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: promotionPiece
-    });
-  }
+    const promotionPiece = prompt('Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)', 'q');
+    handleMove({ from: sourceSquare, to: targetSquare, promotion: promotionPiece });
+  };
 
-  const onMouseOverSquare = (square, piece) => {
-    var moves = game.moves({
-      square: square,
-      verbose: true
-    })
-    if (moves.length === 0) return
-    greySquare(square)
-    setSquareStyles({})
-    for (var i = 0; i < moves.length; i++) {
-      greySquare(moves[i].to)
-    }
-  }
+  const onMouseOverSquare = (square) => {
+    const moves = game.moves({ square, verbose: true });
+    if (moves.length === 0) return;
+    greySquare(square);
+    setSquareStyles({});
+    moves.forEach(move => greySquare(move.to));
+  };
 
   const greySquare = (square) => {
     setSquareStyles((prevStyles) => ({
@@ -56,58 +53,57 @@ export default function ChessGame() {
         borderRadius: '50%'
       }
     }));
-  }
+  };
+
   const handleResetClick = () => {
-    setSquareStyles({})
+    setSquareStyles({});
     game.reset();
     setFen(game.fen());
-  }
+  };
+
   const handleUndoClick = () => {
-    setSquareStyles({})
-    setUndoneMove(game.undo())
+    setSquareStyles({});
+    setUndoneMove(game.undo());
     setFen(game.fen());
-  }
+  };
+
   const handleRedoClick = () => {
-    setSquareStyles({})
-    handleMove(UnddoneMove)
-    setUndoneMove(null);
-  }
+    setSquareStyles({});
+    if (undoneMove) {
+      handleMove(undoneMove);
+      setUndoneMove(null);
+    }
+  };
 
   return (
-    <div>
+    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
       <title>Chess</title>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" , height: "10vh"}}>
-      <FontAwesomeIcon className='menu-icon' onClick={handleResetClick} icon={faRotate} />
-      <FontAwesomeIcon className='menu-icon' onClick={handleUndoClick} icon={faRotateLeft} />
-      <FontAwesomeIcon className='menu-icon' onClick={handleRedoClick} icon={faRotateRight} />
+      <div className="flex justify-center items-center h-10vh space-x-4">
+        <Button onClick={handleResetClick}>
+          <FontAwesomeIcon icon={faRotate} />
+        </Button>
+        <Button onClick={handleUndoClick}>
+          <FontAwesomeIcon icon={faRotateLeft} />
+        </Button>
+        <Button onClick={handleRedoClick}>
+          <FontAwesomeIcon icon={faRotateRight} />
+        </Button>
       </div>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-      <Chessboard
-        className={'chessboard'}
-        position={fen}
-        squareStyles={squareStyles}
-        onMouseOverSquare={onMouseOverSquare}
-        onDrop={(move) => {
-          if (
-            move.sourceSquare[1] === '7' &&
-            move.targetSquare[1] === '8' &&
-            game.get(move.sourceSquare).type === 'p'
-          ) {
-            handlePromotion(move.sourceSquare, move.targetSquare);
-          } else if (
-            move.sourceSquare[1] === '2' &&
-            move.targetSquare[1] === '1' &&
-            game.get(move.sourceSquare).type === 'p'
-          ) {
-            handlePromotion(move.sourceSquare, move.targetSquare);
-          } else {
-            handleMove({
-              from: move.sourceSquare,
-              to: move.targetSquare
-            });
-          }
-        }}
-      />
+      <div className="flex justify-center items-center h-80vh">
+        <ChessBoardLogic
+          fen={fen}
+          squareStyles={squareStyles}
+          onMouseOverSquare={onMouseOverSquare}
+          onDrop={(move) => {
+            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare).type === 'p') ||
+                                (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
+            if (isPromotion) {
+              handlePromotion(move.sourceSquare, move.targetSquare);
+            } else {
+              handleMove({ from: move.sourceSquare, to: move.targetSquare });
+            }
+          }}
+        />
       </div>
     </div>
   )
