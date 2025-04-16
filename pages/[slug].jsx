@@ -38,7 +38,7 @@ export default function ChessGame() {
 
   useEffect(() => {
     if (slug && userId) {
-      ref.on('value', (snapshot) => {
+      ref.once('value', (snapshot) => {
         if (snapshot.exists()) {
           const gameData = snapshot.val();
           setData(gameData);
@@ -51,13 +51,28 @@ export default function ChessGame() {
           }
           else {
             setColor('b');
-            ref.update({ opponent: userId });
-            toast("You joined the game and ready to play.");
+            // Only update opponent ID if it hasn't been set yet
+            if (!gameData.opponent) {
+              ref.update({ opponent: userId });
+              toast("You joined the game and ready to play.");
+            }
           }
         } else {
           ref.set({ id: slug, FEN: fen, createdBy: userId , opponent: null });
           setColor('w');
           toast("Waiting for opponent to join the game.");
+        }
+      });
+      
+      // Set up listener for ongoing changes after initial setup
+      ref.on('value', (snapshot) => {
+        if (snapshot.exists()) {
+          const gameData = snapshot.val();
+          setData(gameData);
+          if (gameData.FEN) {
+            setFen(gameData.FEN);
+            game.load(gameData.FEN);
+          }
         }
       });
     }
