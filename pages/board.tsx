@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from 'react';
-import { Chess } from 'chess.js';
+import { Chess, Square } from 'chess.js';
+// @ts-ignore
 import { Game } from 'js-chess-engine';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRotate, faRotateLeft, faRotateRight } from '@fortawesome/free-solid-svg-icons';
@@ -14,9 +15,15 @@ export default function ChessGame() {
   const [game, setGame] = useState(new Chess());
   const [engine, setEngine] = useState(new Game());
   const [squareStyles, setSquareStyles] = useState({});
-  const [undoneMove, setUndoneMove] = useState(null);
+  const [undoneMove, setUndoneMove] = useState<Move | null>(null);
 
-  const handleMove = (move) => {
+  interface Move {
+    from: Square;
+    to: Square;
+    promotion?: string;
+  }
+
+  const handleMove = (move: Move): void => {
     if (isValidMove(move)) {
       game.move(move);
       setFen(game.fen());
@@ -37,25 +44,50 @@ export default function ChessGame() {
     }
   };
 
-  const isValidMove = (move) => {
+  const isValidMove = (move: Move): boolean => {
     return game.moves({ square: move.from, verbose: true }).some(obj => obj.to === move.to && obj.from === move.from);
   };
 
-  const handlePromotion = (sourceSquare, targetSquare) => {
-    const promotionPiece = prompt('Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)', 'q');
-    handleMove({ from: sourceSquare, to: targetSquare, promotion: promotionPiece });
+  interface PromotionMove extends Move {
+    promotion: string;
+  }
+
+  const handlePromotion = (sourceSquare: Square, targetSquare: Square): void => {
+    const promotionPiece: string | null = prompt('Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)', 'q');
+    if (promotionPiece) {
+      const move: PromotionMove = { from: sourceSquare, to: targetSquare, promotion: promotionPiece };
+      handleMove(move);
+    }
   };
 
-  const onMouseOverSquare = (square) => {
-    const moves = game.moves({ square, verbose: true });
+  interface VerboseMove {
+    color: string;
+    from: Square;
+    to: Square;
+    flags: string;
+    piece: string;
+    san: string;
+    captured?: string;
+    promotion?: string;
+  }
+
+  const onMouseOverSquare = (square: Square): void => {
+    const moves: VerboseMove[] = game.moves({ square, verbose: true });
     if (moves.length === 0) return;
     greySquare(square);
     setSquareStyles({});
-    moves.forEach(move => greySquare(move.to));
+    moves.forEach((move: VerboseMove) => greySquare(move.to));
   };
 
-  const greySquare = (square) => {
-    setSquareStyles((prevStyles) => ({
+  interface SquareStyles {
+    [key: string]: {
+      background: string;
+      borderRadius: string;
+    };
+  }
+
+  const greySquare = (square: Square): void => {
+    setSquareStyles((prevStyles: SquareStyles) => ({
       ...prevStyles,
       [square]: {
         background: 'radial-gradient(circle, white 36%, transparent 40%)',
@@ -72,7 +104,7 @@ export default function ChessGame() {
 
   const handleUndoClick = () => {
     setSquareStyles({});
-    setUndoneMove(game.undo());
+    setUndoneMove(game.undo() as Move | null);
     setFen(game.fen());
   };
 
@@ -102,14 +134,14 @@ export default function ChessGame() {
         <ChessBoardLogic
           fen={fen}
           squareStyles={squareStyles}
-          onMouseOverSquare={onMouseOverSquare}
+          onMouseOverSquare={(square: string) => onMouseOverSquare(square as Square)}
           onDrop={(move) => {
-            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare).type === 'p') ||
-                                (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
+            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare as Square).type === 'p') ||
+                                (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare as Square).type === 'p');
             if (isPromotion) {
-              handlePromotion(move.sourceSquare, move.targetSquare);
+              handlePromotion(move.sourceSquare as Square, move.targetSquare as Square);
             } else {
-              handleMove({ from: move.sourceSquare, to: move.targetSquare });
+              handleMove({ from: move.sourceSquare as Square, to: move.targetSquare as Square });
             }
           }}
         />

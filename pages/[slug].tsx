@@ -5,25 +5,58 @@ import { useRouter } from 'next/router';
 import firebase from '../lib/firebase';
 import 'firebase/database';
 import 'firebase/auth';
-import { Chess } from 'chess.js';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRotate } from '@fortawesome/free-solid-svg-icons';
+// @ts-ignore
+import { Chess, Square } from 'chess.js';
 import ChessBoardLogic from '@/components/ChessBoard';
 import CopyToClipboard from '@/components/CopyToClipboard';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+interface ChessMove {
+  from: string;
+  to: string;
+  promotion?: string;
+}
+
+// Add Chess.js specific types
+interface ChessJsMove {
+  from: string;
+  to: string;
+  promotion?: string;
+  piece?: string;
+  color?: string;
+  flags?: string;
+  san?: string;
+  captured?: string;
+  type?: string;
+}
+
+interface GameData {
+  id: string;
+  FEN: string;
+  createdBy: string;
+  opponent: string | null;
+}
+
+// Type for ChessBoard component props
+interface ChessBoardMove {
+  sourceSquare: string;
+  targetSquare: string;
+}
+
 export default function ChessGame() {
   const db = firebase.database();
   const router = useRouter();
   const { slug } = router.query;
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<GameData | null>(null);
   const [game, setGame] = useState(new Chess());
   const [fen, setFen] = useState(game.fen());
-  const [squareStyles, setSquareStyles] = useState({});
-  const ref = db.ref(`games/${slug}`);
+  const [squareStyles, setSquareStyles] = useState<Record<string, React.CSSProperties>>({});
   const [color, setColor] = useState('b');
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  // Initialize ref with a default to avoid errors, but will be updated when slug is available
+  const [ref, setRef] = useState<firebase.database.Reference | null>(null);
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged(function (user) {
@@ -37,10 +70,17 @@ export default function ChessGame() {
   }, []);
 
   useEffect(() => {
-    if (slug && userId) {
+    if (slug) {
+      const gameRef = db.ref(`games/${slug}`);
+      setRef(gameRef);
+    }
+  }, [slug, db]);
+
+  useEffect(() => {
+    if (slug && userId && ref) {
       ref.once('value', (snapshot) => {
         if (snapshot.exists()) {
-          const gameData = snapshot.val();
+          const gameData = snapshot.val() as GameData;
           setData(gameData);
           if (gameData.FEN) {
             setFen(gameData.FEN);
@@ -58,7 +98,7 @@ export default function ChessGame() {
             }
           }
         } else {
-          ref.set({ id: slug, FEN: fen, createdBy: userId , opponent: null });
+          ref.set({ id: slug, FEN: fen, createdBy: userId, opponent: null });
           setColor('w');
           toast("Waiting for opponent to join the game.");
         }
@@ -67,7 +107,7 @@ export default function ChessGame() {
       // Set up listener for ongoing changes after initial setup
       ref.on('value', (snapshot) => {
         if (snapshot.exists()) {
-          const gameData = snapshot.val();
+          const gameData = snapshot.val() as GameData;
           setData(gameData);
           if (gameData.FEN) {
             setFen(gameData.FEN);
@@ -76,29 +116,41 @@ export default function ChessGame() {
         }
       });
     }
-  }, [slug, userId]);
+  }, [slug, userId, ref, game, fen]);
 
   useEffect(() => {
-    if (data) {
+    if (data && ref) {
       ref.on('child_changed', (snapshot) => {
-        setData((prevData) => ({
-          ...prevData,
-          [snapshot.key]: snapshot.val(),
-        }));
-        if (snapshot.val().FEN) {
-          game.load(snapshot.val().FEN);
+        setData((prevData) => {
+          if (!prevData) return null;
+          return {
+            ...prevData,
+            [snapshot.key as keyof GameData]: snapshot.val(),
+          };
+        });
+        if (snapshot.key === 'FEN' && snapshot.val()) {
+          game.load(snapshot.val());
           setFen(game.fen());
         }
       });
     }
-  }, [data, slug]);
+    
+    return () => {
+      if (ref) {
+        ref.off('child_changed');
+        ref.off('value');
+      }
+    };
+  }, [data, ref, game]);
 
-  const handleMove = (move) => {
+  const handleMove = (move: ChessMove) => {
     if (game.turn() === color) {
-      if (game.moves({ square: move.from, verbose: true }).some(obj => obj.to === move.to && obj.from === move.from)) {
+      if (game.moves({ square: move.from as Square, verbose: true }).some(obj => obj.to === move.to && obj.from === move.from)) {
         game.move(move);
         setSquareStyles({});
-        ref.set({ id: slug, FEN: game.fen() });
+        if (ref && slug) {
+          ref.set({ id: slug, FEN: game.fen(), createdBy: userId, opponent: data?.opponent });
+        }
         if (game.isCheckmate()) {
           toast("Checkmate!", {
             description: "You won.",
@@ -116,25 +168,25 @@ export default function ChessGame() {
     }
   };
 
-  const handlePromotion = (sourceSquare, targetSquare) => {
+  const handlePromotion = (sourceSquare: string, targetSquare: string) => {
     const promotionPiece = prompt('Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)', 'q');
     handleMove({
       from: sourceSquare,
       to: targetSquare,
-      promotion: promotionPiece
+      promotion: promotionPiece || 'q'
     });
   };
 
-  const onMouseOverSquare = (square) => {
+  const onMouseOverSquare = (square: string) => {
     if (game.turn() !== color) return;
-    const moves = game.moves({ square, verbose: true });
+    const moves = game.moves({ square: square as Square, verbose: true });
     if (moves.length === 0) return;
     greySquare(square);
     setSquareStyles({});
     moves.forEach(move => greySquare(move.to));
   };
 
-  const greySquare = (square) => {
+  const greySquare = (square: string) => {
     setSquareStyles((prevStyles) => ({
       ...prevStyles,
       [square]: {
@@ -147,7 +199,9 @@ export default function ChessGame() {
   const handleResetClick = () => {
     game.reset();
     setFen(game.fen());
-    ref.set({ id: slug, FEN: game.fen(), createdBy: userId });
+    if (ref && slug) {
+      ref.set({ id: slug, FEN: game.fen(), createdBy: userId, opponent: data?.opponent });
+    }
   };
 
   return (
@@ -161,8 +215,8 @@ export default function ChessGame() {
           squareStyles={squareStyles}
           onMouseOverSquare={onMouseOverSquare}
           onDrop={(move) => {
-            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare).type === 'p') ||
-              (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare).type === 'p');
+            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare as Square)?.type === 'p') ||
+              (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare as Square)?.type === 'p');
             if (isPromotion) {
               handlePromotion(move.sourceSquare, move.targetSquare);
             } else {
@@ -172,7 +226,7 @@ export default function ChessGame() {
         />
       </div>
       <div>
-        <CopyToClipboard link={"/"+slug} />
+        {typeof slug === 'string' && <CopyToClipboard link={"/"+slug} />}
       </div>
     </div>
   )

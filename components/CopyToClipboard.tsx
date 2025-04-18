@@ -1,44 +1,49 @@
 'use client'
 
-import { useState } from 'react'
-import { Check, Copy } from 'lucide-react'
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { toast } from 'sonner';
 
-export default function CopyToClipboard({ link = '/' }: { link?: string }) {
-  const [copied, setCopied] = useState(false)
+interface CopyToClipboardProps {
+  link: string;
+}
 
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}${link}`)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000) // Reset copied state after 2 seconds
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
-    }
-  }
+export default function CopyToClipboard({ link }: CopyToClipboardProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    // Create full URL with current hostname
+    const fullUrl = typeof window !== 'undefined' 
+      ? `${window.location.origin}${link}` 
+      : link;
+      
+    navigator.clipboard.writeText(fullUrl)
+      .then(() => {
+        setCopied(true);
+        toast("Link copied!", {
+          description: "Share this link with a friend to play together.",
+        });
+        
+        // Reset the copied state after 2 seconds
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(err => {
+        console.error('Failed to copy:', err);
+        toast("Failed to copy link", {
+          description: "Please try again.",
+        });
+      });
+  };
 
   return (
-    <div className="flex w-full max-w-sm items-center space-x-2 p-4">
-      <Input
-        type="text"
-        value={link}
-        readOnly
-        className="flex-grow"
-      />
-      <Button
-        onClick={copyToClipboard}
-        variant="outline"
-        size="icon"
-        className="flex-shrink-0"
-        aria-label="Copy to clipboard"
+    <div className="flex flex-col items-center mt-4">
+      <p className="mb-2 text-sm">Share this game with a friend:</p>
+      <Button 
+        onClick={handleCopy} 
+        className={`${copied ? 'bg-green-600' : 'bg-blue-600'} text-white px-4 py-2 rounded`}
       >
-        {copied ? (
-          <Check className="h-4 w-4 text-green-500" />
-        ) : (
-          <Copy className="h-4 w-4 text-black" />
-        )}
+        {copied ? 'Copied!' : 'Copy Game Link'}
       </Button>
     </div>
-  )
+  );
 }
