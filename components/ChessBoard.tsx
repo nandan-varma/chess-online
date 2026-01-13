@@ -1,8 +1,5 @@
-import React from 'react';
-import dynamic from 'next/dynamic';
-
-// @ts-ignore - Import Chessboard dynamically to avoid SSR issues with DOM-dependent code
-const Chessboard = dynamic(() => import('chessboardjsx'), { ssr: false });
+import React, { useRef, useState, useEffect } from 'react';
+import Chessboard from './chessboard/Chessboard';
 
 interface ChessBoardProps {
   fen: string;
@@ -23,30 +20,51 @@ export default function ChessBoardLogic({
   squareStyles = {},
   onMouseOverSquare = () => {},
   onDrop,
-  width = 560,
+  width,
   ...props
 }: ChessBoardProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [boardWidth, setBoardWidth] = useState(width || 560);
+
+  useEffect(() => {
+    if (!width && containerRef.current) {
+      const updateWidth = () => {
+        if (containerRef.current) {
+          const containerWidth = containerRef.current.offsetWidth;
+          setBoardWidth(Math.min(containerWidth, 800));
+        }
+      };
+      
+      updateWidth();
+      window.addEventListener('resize', updateWidth);
+      return () => window.removeEventListener('resize', updateWidth);
+    }
+  }, [width]);
+
   // Provide a safe fallback for fen if it's undefined
   const safefen = fen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   
   return (
-    <div className="flex justify-center">
-      <div>
+    <div ref={containerRef} className="flex justify-center w-full h-full">
+      <div className="w-full h-full flex items-center justify-center">
         <Chessboard
           id="chessboard"
-          width={width}
+          width={width || boardWidth}
           position={safefen}
           onDrop={onDrop}
           squareStyles={squareStyles}
           onMouseOverSquare={onMouseOverSquare}
-          onMouseOutSquare={() => {}}
+          onMouseOutSquare={props.onMouseOutSquare || (() => {})}
           boardStyle={{
             borderRadius: '5px',
             boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5)'
           }}
           lightSquareStyle={{ backgroundColor: '#f0d9b5' }}
           darkSquareStyle={{ backgroundColor: '#b58863' }}
-          {...props}
+          orientation={props.orientation}
+          draggable={props.draggable}
+          onSquareClick={props.onSquareClick}
+          onSquareRightClick={props.onSquareRightClick}
         />
       </div>
     </div>

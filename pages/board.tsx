@@ -74,9 +74,22 @@ export default function ChessGame() {
   const onMouseOverSquare = (square: Square): void => {
     const moves: VerboseMove[] = game.moves({ square, verbose: true });
     if (moves.length === 0) return;
-    greySquare(square);
+    const newStyles: SquareStyles = {};
+    newStyles[square] = {
+      background: 'radial-gradient(circle, rgba(255,255,255,0.3) 36%, transparent 40%)',
+      borderRadius: '50%'
+    };
+    moves.forEach((move: VerboseMove) => {
+      newStyles[move.to] = {
+        background: 'radial-gradient(circle, rgba(0,0,0,0.2) 36%, transparent 40%)',
+        borderRadius: '50%'
+      };
+    });
+    setSquareStyles(newStyles);
+  };
+
+  const onMouseOutSquare = (): void => {
     setSquareStyles({});
-    moves.forEach((move: VerboseMove) => greySquare(move.to));
   };
 
   interface SquareStyles {
@@ -86,26 +99,20 @@ export default function ChessGame() {
     };
   }
 
-  const greySquare = (square: Square): void => {
-    setSquareStyles((prevStyles: SquareStyles) => ({
-      ...prevStyles,
-      [square]: {
-        background: 'radial-gradient(circle, white 36%, transparent 40%)',
-        borderRadius: '50%'
-      }
-    }));
-  };
-
   const handleResetClick = () => {
     setSquareStyles({});
+    setUndoneMove(null);
     game.reset();
     setFen(game.fen());
   };
 
   const handleUndoClick = () => {
     setSquareStyles({});
-    setUndoneMove(game.undo() as Move | null);
-    setFen(game.fen());
+    const move = game.undo();
+    if (move) {
+      setUndoneMove(move as Move);
+      setFen(game.fen());
+    }
   };
 
   const handleRedoClick = () => {
@@ -117,34 +124,56 @@ export default function ChessGame() {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-900 text-white">
+    <div className="fixed inset-0 flex flex-col bg-gray-900 text-white overflow-hidden">
       <title>Chess</title>
-      <div className="flex justify-center items-center h-10vh space-x-4">
-        <Button onClick={handleResetClick}>
-          <FontAwesomeIcon icon={faRotate} />
-        </Button>
-        <Button onClick={handleUndoClick}>
-          <FontAwesomeIcon icon={faRotateLeft} />
-        </Button>
-        <Button onClick={handleRedoClick}>
-          <FontAwesomeIcon icon={faRotateRight} />
-        </Button>
+      
+      {/* Header with controls */}
+      <div className="w-full px-2 py-3 sm:px-4 sm:py-4">
+        <div className="flex justify-center items-center gap-2 sm:gap-3">
+          <Button 
+            onClick={handleResetClick}
+            className="w-10 h-10 sm:w-12 sm:h-12"
+            size="icon"
+          >
+            <FontAwesomeIcon icon={faRotate} className="text-sm sm:text-base" />
+          </Button>
+          <Button 
+            onClick={handleUndoClick}
+            className="w-10 h-10 sm:w-12 sm:h-12"
+            size="icon"
+          >
+            <FontAwesomeIcon icon={faRotateLeft} className="text-sm sm:text-base" />
+          </Button>
+          <Button 
+            onClick={handleRedoClick}
+            className="w-10 h-10 sm:w-12 sm:h-12"
+            size="icon"
+            disabled={!undoneMove}
+          >
+            <FontAwesomeIcon icon={faRotateRight} className="text-sm sm:text-base" />
+          </Button>
+        </div>
       </div>
-      <div className="flex justify-center items-center h-80vh">
-        <ChessBoardLogic
-          fen={fen}
-          squareStyles={squareStyles}
-          onMouseOverSquare={(square: string) => onMouseOverSquare(square as Square)}
-          onDrop={(move) => {
-            const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare as Square).type === 'p') ||
-                                (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare as Square).type === 'p');
-            if (isPromotion) {
-              handlePromotion(move.sourceSquare as Square, move.targetSquare as Square);
-            } else {
-              handleMove({ from: move.sourceSquare as Square, to: move.targetSquare as Square });
-            }
-          }}
-        />
+      
+      {/* Chess board container */}
+      <div className="flex-1 flex items-center justify-center px-2 pb-2 sm:px-4 sm:pb-4 overflow-hidden">
+        <div className="w-full h-full max-w-[95vmin] max-h-[95vmin] sm:max-w-[90vmin] sm:max-h-[90vmin] aspect-square">
+          <ChessBoardLogic
+            fen={fen}
+            squareStyles={squareStyles}
+            onMouseOverSquare={(square: string) => onMouseOverSquare(square as Square)}
+            onMouseOutSquare={onMouseOutSquare}
+            onDrop={(move) => {
+              const isPromotion = (move.sourceSquare[1] === '7' && move.targetSquare[1] === '8' && game.get(move.sourceSquare as Square)?.type === 'p') ||
+                                  (move.sourceSquare[1] === '2' && move.targetSquare[1] === '1' && game.get(move.sourceSquare as Square)?.type === 'p');
+              if (isPromotion) {
+                handlePromotion(move.sourceSquare as Square, move.targetSquare as Square);
+              } else {
+                handleMove({ from: move.sourceSquare as Square, to: move.targetSquare as Square });
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   )

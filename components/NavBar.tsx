@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { AppBar, Toolbar, Button } from "@mui/material";
 import { useRouter } from "next/router";
-import firebase from '../lib/firebase';
-import 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,17 +16,17 @@ import Link from 'next/link';
 
 const NavBar: React.FC = () => {
   const router = useRouter();
-  const [user, setUser] = useState<firebase.User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
     });
     return () => unsubscribe();
   }, []);
 
   const handleLogout = () => {
-    firebase.auth().signOut().then(() => {
+    signOut(auth).then(() => {
       router.push('/');
     });
   };
