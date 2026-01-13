@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import firebase from '../lib/firebase';
-import 'firebase/auth';
+import { auth } from '../lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { Button } from "@/components/ui/button";
 import {
@@ -21,15 +21,13 @@ export default function Signup() {
   const router = useRouter();
 
   const handleSignup = () => {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        var user = userCredential.user;
+        const user = userCredential.user;
         router.push('/');
       })
       .catch((error) => {
-        var errorMessage = error.message;
+        const errorMessage = error.message;
         alert(errorMessage);
       });
   };
