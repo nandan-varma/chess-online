@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -9,6 +10,12 @@ import {
 import { Bot, Clock, Users } from 'lucide-react';
 import Link from 'next/link';
 import { HomeClient } from './home-client';
+
+export const metadata: Metadata = {
+  title: 'Chess Online - Play with Friends or AI',
+  description:
+    'Play chess online with friends or challenge the AI. Free online chess game with multiplayer support.',
+};
 
 export default function Home() {
   return (
@@ -25,14 +32,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center items-center sm:items-start gap-4 sm:gap-6 perspective-1000">
-            <Link
-              href="/vs-ai"
-              className="w-full max-w-[300px]"
-              style={{
-                transform: 'rotate(-6deg) translateY(0.5rem)',
-                zIndex: 1,
-              }}
-            >
+            <Link href="/vs-ai" className="w-full max-w-[300px]" style={{ transform: 'rotate(-6deg) translateY(0.5rem)', zIndex: 1 }}>
               <Card className="transition-all duration-500 ease-out hover:rotate-0 hover:translate-y-0 hover:z-50 hover:scale-105 cursor-pointer">
                 <CardHeader>
                   <div className="mb-2">
@@ -51,14 +51,7 @@ export default function Home() {
 
             <HomeClient />
 
-            <Link
-              href="/board"
-              className="w-full max-w-[300px]"
-              style={{
-                transform: 'rotate(6deg) translateY(0.5rem)',
-                zIndex: 1,
-              }}
-            >
+            <Link href="/board" className="w-full max-w-[300px]" style={{ transform: 'rotate(6deg) translateY(0.5rem)', zIndex: 1 }}>
               <Card className="transition-all duration-500 ease-out hover:rotate-0 hover:translate-y-0 hover:z-50 hover:scale-105 cursor-pointer">
                 <CardHeader>
                   <div className="mb-2">
