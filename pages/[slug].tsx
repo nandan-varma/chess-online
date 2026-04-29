@@ -251,9 +251,9 @@ export default function ChessGame() {
 
   if (!userId || !isInitialized) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 text-white">
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
           <p>Loading game...</p>
         </div>
       </div>
@@ -261,25 +261,23 @@ export default function ChessGame() {
   }
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-900 text-white overflow-hidden">
-      <title>Chess Online</title>
-      
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header with game info */}
-      <div className="w-full px-2 py-2 sm:px-4 sm:py-3">
+      <div className="w-full px-2 py-2 sm:px-4 sm:py-3 shrink-0">
         <h1 className="text-lg sm:text-xl font-bold text-center mb-1 sm:mb-2">Online Multiplayer</h1>
-        <div className="text-center text-xs sm:text-sm text-gray-400 mb-1">
+        <div className="text-center text-xs sm:text-sm text-muted-foreground mb-1">
           {color === 'w' ? 'Playing as White' : 'Playing as Black'}
         </div>
         {gameData && !gameData.opponent && color === 'w' && (
           <div className="text-center">
-            <p className="text-yellow-400 text-xs sm:text-sm">Waiting for opponent...</p>
+            <p className="text-yellow-500 text-xs sm:text-sm">Waiting for opponent...</p>
           </div>
         )}
       </div>
       
       {/* Chess board container */}
-      <div className="flex-1 flex items-center justify-center px-2 sm:px-4 overflow-hidden">
-        <div className="w-full h-full max-w-[95vmin] max-h-[95vmin] sm:max-w-[90vmin] sm:max-h-[90vmin] aspect-square">
+      <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2 overflow-hidden">
+        <div className="w-full aspect-square max-w-[90vmin]">
           <ChessBoardLogic
             fen={fen}
             squareStyles={squareStyles}
@@ -303,7 +301,7 @@ export default function ChessGame() {
       </div>
       
       {/* Share link section */}
-      <div className="w-full px-2 py-2 sm:px-4 sm:py-3">
+      <div className="w-full px-2 py-2 sm:px-4 sm:py-3 shrink-0">
         <div className="flex flex-col items-center gap-2">
           {typeof slug === 'string' && <CopyToClipboard link={"/"+slug} />}
           <Button 

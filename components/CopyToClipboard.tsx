@@ -12,7 +12,6 @@ export default function CopyToClipboard({ link }: CopyToClipboardProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    // Create full URL with current hostname
     const fullUrl = typeof window !== 'undefined' 
       ? `${window.location.origin}${link}` 
       : link;
@@ -24,7 +23,6 @@ export default function CopyToClipboard({ link }: CopyToClipboardProps) {
           description: "Share this link with a friend to play together.",
         });
         
-        // Reset the copied state after 2 seconds
         setTimeout(() => setCopied(false), 2000);
       })
       .catch(err => {
@@ -36,14 +34,12 @@ export default function CopyToClipboard({ link }: CopyToClipboardProps) {
   };
 
   return (
-    <div className="flex flex-col items-center mt-4">
-      <p className="mb-2 text-sm">Share this game with a friend:</p>
-      <Button 
-        onClick={handleCopy} 
-        className={`${copied ? 'bg-green-600' : 'bg-blue-600'} text-white px-4 py-2 rounded`}
-      >
-        {copied ? 'Copied!' : 'Copy Game Link'}
-      </Button>
-    </div>
+    <Button 
+      onClick={handleCopy} 
+      variant={copied ? "secondary" : "default"}
+      className="w-full max-w-[200px]"
+    >
+      {copied ? 'Copied!' : 'Copy Game Link'}
+    </Button>
   );
 }

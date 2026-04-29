@@ -124,11 +124,9 @@ export default function ChessGame() {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-gray-900 text-white overflow-hidden">
-      <title>Chess</title>
-      
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header with controls */}
-      <div className="w-full px-2 py-3 sm:px-4 sm:py-4">
+      <div className="w-full px-2 py-3 sm:px-4 sm:py-4 shrink-0">
         <div className="flex justify-center items-center gap-2 sm:gap-3">
           <Button 
             onClick={handleResetClick}
@@ -156,8 +154,8 @@ export default function ChessGame() {
       </div>
       
       {/* Chess board container */}
-      <div className="flex-1 flex items-center justify-center px-2 pb-2 sm:px-4 sm:pb-4 overflow-hidden">
-        <div className="w-full h-full max-w-[95vmin] max-h-[95vmin] sm:max-w-[90vmin] sm:max-h-[90vmin] aspect-square">
+      <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2 overflow-hidden">
+        <div className="w-full aspect-square max-w-[90vmin]">
           <ChessBoardLogic
             fen={fen}
             squareStyles={squareStyles}

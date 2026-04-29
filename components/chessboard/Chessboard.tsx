@@ -18,7 +18,7 @@ function Chessboard({
   boardStyle = {},
   lightSquareStyle = {},
   darkSquareStyle = {},
-}: ChessboardProps): JSX.Element {
+}: ChessboardProps): React.ReactElement {
   const [draggedSquare, setDraggedSquare] = useState<Square | null>(null);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
 
