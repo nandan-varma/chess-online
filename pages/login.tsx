@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Head from 'next/head';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
@@ -33,8 +34,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-[350px]">
+    <>
+      <Head>
+        <title>Login - Chess Online</title>
+        <meta name="description" content="Login to your Chess Online account to play with friends." />
+      </Head>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-[350px]">
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>Access your account</CardDescription>
@@ -71,5 +77,6 @@ export default function Login() {
         </CardFooter>
       </Card>
     </div>
+    </>
   );
 }

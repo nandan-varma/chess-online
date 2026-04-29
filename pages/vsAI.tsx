@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react';
+import Head from 'next/head';
 // @ts-ignore
 import { Chess, Square } from 'chess.js';
 // @ts-ignore
@@ -175,9 +176,14 @@ export default function ChessGame() {
   };
 
 return (
-    <div className="fixed inset-0 flex flex-col bg-background text-foreground overflow-hidden">
-      {/* Header with controls */}
-      <div className="w-full px-2 py-2 sm:px-4 sm:py-3 shrink-0">
+    <>
+      <Head>
+        <title>Play vs AI - Chess Online</title>
+        <meta name="description" content="Challenge the AI to a game of chess. Free online chess game." />
+      </Head>
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
+        {/* Header with controls */}
+        <div className="w-full px-2 py-2 sm:px-4 sm:py-3 shrink-0">
         <h1 className="text-lg sm:text-xl font-bold text-center mb-2 sm:mb-3">Play vs AI</h1>
         <div className="flex justify-center items-center gap-2 sm:gap-3">
           <Button 
@@ -231,5 +237,6 @@ return (
         </div>
       </div>
     </div>
+    </>
   );
 }

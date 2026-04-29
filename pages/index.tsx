@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import Head from "next/head";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +16,7 @@ function generateRandomId() {
 }
 
 const Index = () => {
-  const [friendUrl, setFriendUrl] = useState<string | null>(null);
+  const [friendUrl, setFriendUrl] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,7 +27,15 @@ const Index = () => {
   const cardBase = "w-full max-w-[300px] relative transition-all duration-500 ease-out hover:rotate-0 hover:translate-y-0 hover:z-50 hover:scale-105 cursor-pointer";
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
+      <Head>
+        <title>Chess Online - Play with Friends or AI</title>
+        <meta name="description" content="Play chess online with friends or challenge the AI. Free online chess game with multiplayer support." />
+        <meta property="og:title" content="Chess Online - Play with Friends or AI" />
+        <meta property="og:description" content="Play chess online with friends or challenge the AI. Free online chess game with multiplayer support." />
+        <meta property="og:type" content="website" />
+      </Head>
+      <div className="min-h-screen bg-background flex flex-col">
       <div className="flex-1 container mx-auto px-4 py-8 sm:py-16">
         <div className="mx-auto max-w-md sm:max-w-4xl">
           <div className="text-center mb-8 sm:mb-16">
@@ -102,6 +111,7 @@ const Index = () => {
         &copy; {new Date().getFullYear()} Nandan Varma
       </footer>
     </div>
+    </>
   );
 };
 
