@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import Head from 'next/head';
-import { auth } from '../lib/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useRouter } from 'next/router';
-import { Button } from "@/components/ui/button";
+'use client';
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -11,10 +8,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -23,24 +24,17 @@ export default function Login() {
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then(() => {
         router.push('/');
       })
       .catch((error) => {
-        const errorMessage = error.message;
-        alert(errorMessage);
+        alert(error.message);
       });
   };
 
   return (
-    <>
-      <Head>
-        <title>Login - Chess Online</title>
-        <meta name="description" content="Login to your Chess Online account to play with friends." />
-      </Head>
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-[350px]">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-[350px]">
         <CardHeader>
           <CardTitle>Login</CardTitle>
           <CardDescription>Access your account</CardDescription>
@@ -77,6 +71,5 @@ export default function Login() {
         </CardFooter>
       </Card>
     </div>
-    </>
   );
 }

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Piece } from './types';
+import type React from 'react';
 import { PieceIcon } from './pieces';
+import { Piece } from './types';
 import type { SquareComponentProps } from './types';
 
 function SquareComponent({
@@ -38,17 +38,22 @@ function SquareComponent({
     justifyContent: 'center',
     position: 'relative',
     cursor: piece && draggable ? 'grab' : 'default',
-    ...(isLight ? { ...defaultLightStyle, ...lightSquareStyle } : { ...defaultDarkStyle, ...darkSquareStyle }),
+    ...(isLight
+      ? { ...defaultLightStyle, ...lightSquareStyle }
+      : { ...defaultDarkStyle, ...darkSquareStyle }),
   };
 
   // Layer the custom square style on top (for move indicators, etc.)
-  const overlayStyle: React.CSSProperties = squareStyle ? {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'none',
-    ...squareStyle,
-  } : {};
+  const overlayStyle = squareStyle
+    ? {
+        position: 'absolute' as const,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none' as const,
+        background: squareStyle.background,
+        borderRadius: squareStyle.borderRadius,
+      }
+    : {};
 
   const handleClick = () => {
     onSquareClick?.(square);
@@ -99,7 +104,7 @@ function SquareComponent({
     >
       {/* Overlay for move indicators */}
       {squareStyle && <div style={overlayStyle} />}
-      
+
       {piece && (
         <div
           draggable={draggable}

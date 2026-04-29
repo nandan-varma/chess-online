@@ -113,19 +113,19 @@ body {
   .perspective-1000 {
     perspective: 1000px;
   }
-  
+
   .animate-card-left {
     animation: cardLeft 0.5s ease-out forwards;
   }
-  
+
   .animate-card-center {
     animation: cardCenter 0.5s ease-out forwards;
   }
-  
+
   .animate-card-right {
     animation: cardRight 0.5s ease-out forwards;
   }
-  
+
   @keyframes cardLeft {
     from {
       transform: rotate(0deg) translateY(0) translateX(-20px);
@@ -135,7 +135,7 @@ body {
       transform: rotate(-6deg) translateY(0.5rem);
     }
   }
-  
+
   @keyframes cardCenter {
     from {
       transform: rotate(0deg) translateY(-20px);
@@ -145,7 +145,7 @@ body {
       transform: rotate(0deg) translateY(0);
     }
   }
-  
+
   @keyframes cardRight {
     from {
       transform: rotate(0deg) translateY(0) translateX(20px);
@@ -155,35 +155,25 @@ body {
       transform: rotate(6deg) translateY(0.5rem);
     }
   }
-  
+
   .shadow-3d {
-    box-shadow: 
-      0 4px 0 rgba(0, 0, 0, 0.15),
-      0 6px 8px rgba(0, 0, 0, 0.1),
-      0 8px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15), 0 6px 8px rgba(0, 0, 0, 0.1), 0 8px
+      16px rgba(0, 0, 0, 0.05);
   }
   .shadow-3d-sm {
-    box-shadow: 
-      0 2px 0 rgba(0, 0, 0, 0.12),
-      0 3px 4px rgba(0, 0, 0, 0.08),
-      0 4px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.08), 0
+      4px 8px rgba(0, 0, 0, 0.04);
   }
   .shadow-3d-lg {
-    box-shadow: 
-      0 6px 0 rgba(0, 0, 0, 0.18),
-      0 8px 12px rgba(0, 0, 0, 0.12),
-      0 12px 24px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18), 0 8px 12px rgba(0, 0, 0, 0.12), 0
+      12px 24px rgba(0, 0, 0, 0.06);
   }
   .shadow-card {
-    box-shadow: 
-      0 1px 3px rgba(0, 0, 0, 0.04),
-      0 4px 6px rgba(0, 0, 0, 0.04),
-      0 8px 16px rgba(0, 0, 0, 0.02);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 6px rgba(0, 0, 0, 0.04), 0
+      8px 16px rgba(0, 0, 0, 0.02);
   }
   .shadow-card-hover {
-    box-shadow: 
-      0 2px 4px rgba(0, 0, 0, 0.05),
-      0 6px 10px rgba(0, 0, 0, 0.05),
-      0 12px 24px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 6px 10px rgba(0, 0, 0, 0.05), 0
+      12px 24px rgba(0, 0, 0, 0.03);
   }
 }

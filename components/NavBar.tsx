@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { auth } from '../lib/firebase';
-import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,10 +6,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { LogOut, User as UserIcon, Menu } from "lucide-react";
+} from '@/components/ui/dropdown-menu';
+import { type User, onAuthStateChanged, signOut } from 'firebase/auth';
+import { LogOut, Menu, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { auth } from '../lib/firebase';
 
 const NavBar: React.FC = () => {
   const router = useRouter();
@@ -49,7 +50,9 @@ const NavBar: React.FC = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-2">
                       <UserIcon className="h-4 w-4" />
-                      <span className="max-w-[150px] truncate">{user.email}</span>
+                      <span className="max-w-[150px] truncate">
+                        {user.email}
+                      </span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
@@ -64,10 +67,14 @@ const NavBar: React.FC = () => {
               ) : (
                 <>
                   <Link href="/login" passHref>
-                    <Button variant="ghost" size="sm">Log In</Button>
+                    <Button variant="ghost" size="sm">
+                      Log In
+                    </Button>
                   </Link>
                   <Link href="/signup" passHref>
-                    <Button variant="default" size="sm">Sign Up</Button>
+                    <Button variant="default" size="sm">
+                      Sign Up
+                    </Button>
                   </Link>
                 </>
               )}

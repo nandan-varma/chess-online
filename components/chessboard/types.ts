@@ -1,5 +1,17 @@
 export type Square = string; // e.g., 'a1', 'e4', etc.
-export type Piece = 'wP' | 'wN' | 'wB' | 'wR' | 'wQ' | 'wK' | 'bP' | 'bN' | 'bB' | 'bR' | 'bQ' | 'bK';
+export type Piece =
+  | 'wP'
+  | 'wN'
+  | 'wB'
+  | 'wR'
+  | 'wQ'
+  | 'wK'
+  | 'bP'
+  | 'bN'
+  | 'bB'
+  | 'bR'
+  | 'bQ'
+  | 'bK';
 export type PieceColor = 'w' | 'b';
 export type PieceType = 'p' | 'n' | 'b' | 'r' | 'q' | 'k';
 

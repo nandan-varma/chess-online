@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import Head from 'next/head';
-import { auth } from '../lib/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { useRouter } from 'next/router';
-import { Button } from "@/components/ui/button";
+'use client';
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -11,10 +8,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { auth } from '@/lib/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Signup() {
   const [email, setEmail] = useState('');
@@ -23,27 +24,20 @@ export default function Signup() {
 
   const handleSignup = () => {
     createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
+      .then(() => {
         router.push('/');
       })
       .catch((error) => {
-        const errorMessage = error.message;
-        alert(errorMessage);
+        alert(error.message);
       });
   };
 
   return (
-    <>
-      <Head>
-        <title>Sign Up - Chess Online</title>
-        <meta name="description" content="Create an account to play chess online with friends." />
-      </Head>
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-[350px]">
-          <CardHeader>
-            <CardTitle>Sign Up</CardTitle>
-            <CardDescription>Create your account</CardDescription>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-[350px]">
+        <CardHeader>
+          <CardTitle>Sign Up</CardTitle>
+          <CardDescription>Create your account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
@@ -77,6 +71,5 @@ export default function Signup() {
         </CardFooter>
       </Card>
     </div>
-    </>
   );
 }

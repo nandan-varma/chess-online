@@ -1,7 +1,8 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import type React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import SquareComponent from './Square';
+import type { ChessboardProps, Piece, Position, Square } from './types';
 import { fenToPosition, getSquares, isLightSquare } from './utils';
-import type { ChessboardProps, Position, Piece, Square } from './types';
 
 function Chessboard({
   id = 'chessboard',
@@ -66,7 +67,7 @@ function Chessboard({
   const handleSquareClickInternal = useCallback(
     (square: Square) => {
       const piece = parsedPosition[square];
-      
+
       // If there's a selected square and we're clicking a different square, try to move
       if (selectedSquare && selectedSquare !== square) {
         if (onDrop) {
@@ -76,7 +77,7 @@ function Chessboard({
           });
         }
         setSelectedSquare(null);
-      } 
+      }
       // If clicking the same square, deselect it
       else if (selectedSquare === square) {
         setSelectedSquare(null);
@@ -85,7 +86,7 @@ function Chessboard({
       else if (piece) {
         setSelectedSquare(square);
       }
-      
+
       // Also call the user's onSquareClick if provided
       onSquareClick?.(square);
     },
@@ -110,7 +111,7 @@ function Chessboard({
         const piece = parsedPosition[square] || null;
         const isLight = isLightSquare(square);
         let customSquareStyle = squareStyles[square];
-        
+
         // Add selection highlight
         if (selectedSquare === square) {
           customSquareStyle = {
