@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Head from 'next/head';
 import { auth } from '../lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
@@ -33,11 +34,16 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-[350px]">
-        <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create your account</CardDescription>
+    <>
+      <Head>
+        <title>Sign Up - Chess Online</title>
+        <meta name="description" content="Create an account to play chess online with friends." />
+      </Head>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-[350px]">
+          <CardHeader>
+            <CardTitle>Sign Up</CardTitle>
+            <CardDescription>Create your account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
@@ -71,5 +77,6 @@ export default function Signup() {
         </CardFooter>
       </Card>
     </div>
+    </>
   );
 }

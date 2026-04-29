@@ -1,12 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 
 const Footer: React.FC = () => {
-  const [year, setYear] = useState<number>(2026);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const year = new Date().getFullYear();
 
   return (
     <footer className="w-full border-t bg-card py-6">

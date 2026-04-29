@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react';
+import Head from 'next/head';
 import { Chess, Square } from 'chess.js';
 // @ts-ignore
 import { Game } from 'js-chess-engine';
@@ -124,7 +125,12 @@ export default function ChessGame() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <>
+      <Head>
+        <title>Local Chess - Chess Online</title>
+        <meta name="description" content="Play chess locally on the same device. Free online chess game." />
+      </Head>
+      <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header with controls */}
       <div className="w-full px-2 py-3 sm:px-4 sm:py-4 shrink-0">
         <div className="flex justify-center items-center gap-2 sm:gap-3">
@@ -174,5 +180,6 @@ export default function ChessGame() {
         </div>
       </div>
     </div>
+    </>
   )
 }
