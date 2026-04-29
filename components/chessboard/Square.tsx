@@ -101,6 +101,9 @@ function SquareComponent({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       data-square={square}
+      role="gridcell"
+      aria-label={`${square}${piece ? `, ${piece}` : ''}`}
+      tabIndex={0}
     >
       {/* Overlay for move indicators */}
       {squareStyle && <div style={overlayStyle} />}
