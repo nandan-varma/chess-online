@@ -1,4 +1,4 @@
-import { Position, Piece, Square } from './types';
+import type { Piece, Position, Square } from './types';
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const RANKS = ['1', '2', '3', '4', '5', '6', '7', '8'];
@@ -12,20 +12,19 @@ export function fenToPosition(fen: string): Position {
   }
 
   const position: Position = {};
-  const rows = fen.split(' ')[0].split('/');
+  const fenParts = fen.split(' ');
+  const rows = (fenParts[0] ?? '').split('/');
 
   for (let rank = 0; rank < 8; rank++) {
     let file = 0;
-    const row = rows[rank];
+    const row = rows[rank] ?? '';
 
     for (let i = 0; i < row.length; i++) {
-      const char = row[i];
+      const char = row[i] ?? '';
 
       if (char >= '1' && char <= '8') {
-        // Empty squares
-        file += parseInt(char, 10);
-      } else {
-        // Piece
+        file += Number.parseInt(char, 10);
+      } else if (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z') {
         const color = char === char.toUpperCase() ? 'w' : 'b';
         const pieceType = char.toLowerCase();
         const square = `${FILES[file]}${8 - rank}` as Square;
@@ -59,8 +58,8 @@ export function getSquares(orientation: 'white' | 'black'): Square[] {
  * Check if square is light colored
  */
 export function isLightSquare(square: Square): boolean {
-  const file = square.charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = parseInt(square[1], 10) - 1;
+  const file = square.charCodeAt(0) - 97;
+  const rank = Number.parseInt(square[1] ?? '1', 10) - 1;
   return (file + rank) % 2 !== 0;
 }
 
@@ -68,8 +67,8 @@ export function isLightSquare(square: Square): boolean {
  * Convert square to coordinates
  */
 export function squareToCoords(square: Square): { file: number; rank: number } {
-  const file = square.charCodeAt(0) - 'a'.charCodeAt(0);
-  const rank = parseInt(square[1], 10) - 1;
+  const file = square.charCodeAt(0) - 97;
+  const rank = Number.parseInt(square[1] ?? '1', 10) - 1;
   return { file, rank };
 }
 

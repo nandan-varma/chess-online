@@ -1,5 +1,5 @@
-import React from 'react';
-import { Piece } from './types';
+import type React from 'react';
+import type { Piece } from './types';
 
 interface PieceIconProps {
   piece: Piece;
@@ -23,7 +23,7 @@ const piecesSVG: Record<Piece, string> = {
 
 export function PieceIcon({ piece, size }: PieceIconProps): React.ReactElement {
   const svg = piecesSVG[piece];
-  
+
   return (
     <div
       style={{
