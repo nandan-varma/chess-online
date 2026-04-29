@@ -33,15 +33,15 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900">
-      <Card className="w-[350px]">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="w-full max-w-[350px]">
         <CardHeader>
-          <CardTitle>Signup</CardTitle>
+          <CardTitle>Sign Up</CardTitle>
           <CardDescription>Create your account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 type="email"
@@ -51,7 +51,7 @@ export default function Signup() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="flex flex-col space-y-1.5">
+            <div className="flex flex-col space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 type="password"
@@ -65,9 +65,9 @@ export default function Signup() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Link href="/" passHref>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="ghost">Cancel</Button>
           </Link>
-          <Button onClick={handleSignup}>Signup</Button>
+          <Button onClick={handleSignup}>Sign Up</Button>
         </CardFooter>
       </Card>
     </div>

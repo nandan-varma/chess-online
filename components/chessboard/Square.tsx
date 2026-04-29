@@ -19,7 +19,7 @@ function SquareComponent({
   onDragOver,
   onDrop,
   draggable = true,
-}: SquareComponentProps): JSX.Element {
+}: SquareComponentProps): React.ReactElement {
   const squareSize = width / 8;
 
   const defaultLightStyle: React.CSSProperties = {
