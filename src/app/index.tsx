@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/card'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Bot, Clock } from 'lucide-react'
-import HomeClientCard from './HomeClientCard'
+import HomeClientCard from './-HomeClientCard'
 
 /**
  * Route configuration
