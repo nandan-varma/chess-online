@@ -1,23 +1,19 @@
-/**
- * Application entry point
- * Initializes React app with providers and router
- */
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider } from '@tanstack/react-router'
 import { getRouter } from './router'
-
-// Initialize theme on app load
 import { initializeTheme } from './lib/theme'
+import './styles/globals.css'
+
+// Initialize theme
 initializeTheme()
 
 const router = getRouter()
 
 const rootElement = document.getElementById('root')
 
-if (!rootElement?.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement!)
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement)
   root.render(
     <React.StrictMode>
       <RouterProvider router={router} />
