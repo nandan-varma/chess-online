@@ -20,3 +20,4 @@ export {
   useUndoMove,
 } from './useGame';
 export { useNotification } from './useNotification';
+export { useNavigation } from './useNavigation';

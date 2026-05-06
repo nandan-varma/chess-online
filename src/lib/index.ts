@@ -5,3 +5,10 @@
 export { auth, database } from './firebase';
 export { logger } from './logger';
 export * from './utils';
+export {
+  NAVIGATION_ROUTES,
+  ROUTE_METADATA,
+  getRouteMetadata,
+  getGameRoutes,
+  generateBreadcrumbs,
+} from './navigation';
