@@ -9,11 +9,15 @@ export enum LogLevel {
   ERROR = 'ERROR',
 }
 
+interface LogData {
+  [key: string]: string | number | boolean | Record<string, unknown> | Error
+}
+
 interface LogEntry {
   timestamp: Date
   level: LogLevel
   message: string
-  data?: unknown
+  data?: LogData
   source?: string
 }
 
@@ -41,7 +45,7 @@ class LoggerService {
   /**
    * Add log entry
    */
-  private addLog(level: LogLevel, message: string, data?: unknown, source?: string): void {
+  private addLog(level: LogLevel, message: string, data?: LogData, source?: string): void {
     if (!this.shouldLog(level)) return
 
     const entry: LogEntry = {
@@ -70,7 +74,7 @@ class LoggerService {
    */
   private logToConsole(entry: LogEntry): void {
     const prefix = `[${entry.level}${entry.source ? ` - ${entry.source}` : ''}]`
-    const style = {
+    const style: Record<LogLevel, string> = {
       DEBUG: 'color: #888',
       INFO: 'color: #0066cc',
       WARN: 'color: #ff9900',
@@ -83,35 +87,35 @@ class LoggerService {
   /**
    * Debug log
    */
-  debug(message: string, data?: unknown, source?: string): void {
+  debug(message: string, data?: LogData, source?: string): void {
     this.addLog(LogLevel.DEBUG, message, data, source)
   }
 
   /**
    * Info log
    */
-  info(message: string, data?: unknown, source?: string): void {
+  info(message: string, data?: LogData, source?: string): void {
     this.addLog(LogLevel.INFO, message, data, source)
   }
 
   /**
    * Warning log
    */
-  warn(message: string, data?: unknown, source?: string): void {
+  warn(message: string, data?: LogData, source?: string): void {
     this.addLog(LogLevel.WARN, message, data, source)
   }
 
   /**
    * Error log
    */
-  error(message: string, data?: unknown, source?: string): void {
+  error(message: string, data?: LogData, source?: string): void {
     this.addLog(LogLevel.ERROR, message, data, source)
   }
 
   /**
    * Get all logs
    */
-  getLogs(level?: LogLevel): LogEntry[] {
+  getLogs(level?: LogLevel): readonly LogEntry[] {
     if (!level) return [...this.logs]
     return this.logs.filter((log) => log.level === level)
   }

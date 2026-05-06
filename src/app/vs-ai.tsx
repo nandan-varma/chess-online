@@ -16,8 +16,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { Square } from 'chess.js'
 import { Chess } from 'chess.js'
-// @ts-ignore - js-chess-engine doesn't have TypeScript types
-import { Engine, Game } from 'js-chess-engine'
+import { Game } from 'js-chess-engine'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import type { ChessMove, SquareStyles } from '@/types'

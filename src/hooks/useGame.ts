@@ -5,13 +5,13 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { gameService } from '@/services/gameService'
-import type { Game, GameMode, AIDifficulty } from '@/types/game'
+import type { GameMode, AIDifficulty } from '@/types/game'
 
 // Query key factory for organized, maintainable cache keys
 export const gameKeys = {
   all: ['games'] as const,
   lists: () => [...gameKeys.all, 'list'] as const,
-  list: (filters: Record<string, any>) => [...gameKeys.lists(), filters] as const,
+  list: (filters?: Record<string, unknown>) => [...gameKeys.lists(), filters] as const,
   details: () => [...gameKeys.all, 'detail'] as const,
   detail: (id: string) => [...gameKeys.details(), id] as const,
 }

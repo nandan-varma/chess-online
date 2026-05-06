@@ -24,6 +24,7 @@ import {
   set,
   update,
   type DatabaseReference,
+  type DataSnapshot,
 } from 'firebase/database'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -150,7 +151,7 @@ function MultiplayerGame() {
   useEffect(() => {
     if (!gameDbRef.current || !isInitialized) return
 
-    const handleValueChange = (snapshot: any) => {
+    const handleValueChange = (snapshot: DataSnapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val() as GameData
         setGameData(data)

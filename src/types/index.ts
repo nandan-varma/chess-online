@@ -3,14 +3,12 @@
  * Centralized types to avoid repetition and ensure type safety
  */
 
-import type { Square } from 'chess.js'
-
 /**
  * Represents a chess move on the board
  */
 export interface ChessMove {
-  from: string | Square
-  to: string | Square
+  from: string
+  to: string
   promotion?: string
 }
 
@@ -18,9 +16,9 @@ export interface ChessMove {
  * Verbose move information from chess.js
  */
 export interface VerboseMove {
-  color: string
-  from: Square
-  to: Square
+  color: 'w' | 'b'
+  from: string
+  to: string
   flags: string
   piece: string
   san: string
@@ -66,7 +64,7 @@ export interface ChessBoardProps {
  * Authentication context type
  */
 export interface AuthContextType {
-  user: any | null
+  user: import('./auth').User | null
   loading: boolean
   error: Error | null
 }

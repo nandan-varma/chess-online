@@ -28,19 +28,25 @@ export default function ChessBoardLogic({
   const [boardWidth, setBoardWidth] = useState(width || 560);
 
   useEffect(() => {
-    if (!width && containerRef.current) {
-      const updateWidth = (): void => {
-        if (containerRef.current) {
-          const containerWidth = containerRef.current.offsetWidth;
-          setBoardWidth(Math.min(containerWidth, 800));
-        }
-      };
-
-      updateWidth();
-      window.addEventListener('resize', updateWidth);
-      return () => window.removeEventListener('resize', updateWidth);
+    if (width) {
+      return
     }
-  }, [width]);
+
+    if (!containerRef.current) {
+      return
+    }
+
+    const updateWidth = (): void => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth
+        setBoardWidth(Math.min(containerWidth, 800))
+      }
+    }
+
+    updateWidth()
+    window.addEventListener('resize', updateWidth)
+    return () => window.removeEventListener('resize', updateWidth)
+  }, [width])
 
   // Provide a safe fallback for fen if it's undefined
   const safefen =
