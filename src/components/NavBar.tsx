@@ -3,9 +3,15 @@
  * Displays top navigation with authentication state and user menu
  */
 
-'use client'
+'use client';
 
-import { Button } from '@/components/ui/button'
+import { Link } from '@tanstack/react-router';
+import type { User } from 'firebase/auth';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { LogOut, Menu, User as UserIcon } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,49 +19,46 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { auth } from '@/lib/firebase'
-import { Link } from '@tanstack/react-router'
-import type { User } from 'firebase/auth'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { LogOut, Menu, User as UserIcon } from 'lucide-react'
-import type React from 'react'
-import { useEffect, useState } from 'react'
+} from '@/components/ui/dropdown-menu';
+import { auth } from '@/lib/firebase';
 
 /**
  * Navigation bar component
  */
 const NavBar: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
-      setIsLoading(false)
-    })
+      setUser(user);
+      setIsLoading(false);
+    });
 
     return () => {
-      unsubscribe()
-    }
-  }, [])
+      unsubscribe();
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth)
-      window.location.href = '/'
+      await signOut(auth);
+      window.location.href = '/';
     } catch (error) {
-      console.error('Logout error:', error)
+      console.error('Logout error:', error);
     }
-  }
+  };
 
   return (
     <nav className="w-full border-b bg-card shadow-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity">
+            <Link
+              to="/"
+              className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity"
+            >
               Chess Online
             </Link>
           </div>
@@ -66,7 +69,10 @@ const NavBar: React.FC = () => {
               <div className="hidden md:block">
                 <div className="flex items-center gap-2">
                   {user ? (
-                    <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                    <DropdownMenu
+                      open={isMenuOpen}
+                      onOpenChange={setIsMenuOpen}
+                    >
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="gap-2">
                           <UserIcon className="h-4 w-4" />
@@ -144,7 +150,7 @@ const NavBar: React.FC = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default NavBar
+export default NavBar;

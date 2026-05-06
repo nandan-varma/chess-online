@@ -3,17 +3,17 @@
  * Landing page with game mode selection
  */
 
-import { Button } from '@/components/ui/button'
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Bot, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { Bot, Clock } from 'lucide-react'
-import HomeClientCard from './-HomeClientCard'
+} from '@/components/ui/card';
+import HomeClientCard from './-HomeClientCard';
 
 /**
  * Route configuration
@@ -32,13 +32,13 @@ export const Route = createFileRoute('/')({
       },
     ],
   }),
-})
+});
 
 /**
  * Home page component
  */
 function Home() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -114,5 +114,5 @@ function Home() {
         &copy; {currentYear} Nandan Varma
       </footer>
     </div>
-  )
+  );
 }

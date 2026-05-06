@@ -2,5 +2,5 @@
  * Utilities export - Helper functions for the application
  */
 
-export * from './string'
-export * from './chess'
+export * from './chess';
+export * from './string';

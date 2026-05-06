@@ -157,23 +157,33 @@ body {
   }
 
   .shadow-3d {
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15), 0 6px 8px rgba(0, 0, 0, 0.1), 0 8px
-      16px rgba(0, 0, 0, 0.05);
+    box-shadow:
+      0 4px 0 rgba(0, 0, 0, 0.15),
+      0 6px 8px rgba(0, 0, 0, 0.1),
+      0 8px 16px rgba(0, 0, 0, 0.05);
   }
   .shadow-3d-sm {
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.08), 0
-      4px 8px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 2px 0 rgba(0, 0, 0, 0.12),
+      0 3px 4px rgba(0, 0, 0, 0.08),
+      0 4px 8px rgba(0, 0, 0, 0.04);
   }
   .shadow-3d-lg {
-    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18), 0 8px 12px rgba(0, 0, 0, 0.12), 0
-      12px 24px rgba(0, 0, 0, 0.06);
+    box-shadow:
+      0 6px 0 rgba(0, 0, 0, 0.18),
+      0 8px 12px rgba(0, 0, 0, 0.12),
+      0 12px 24px rgba(0, 0, 0, 0.06);
   }
   .shadow-card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 6px rgba(0, 0, 0, 0.04), 0
-      8px 16px rgba(0, 0, 0, 0.02);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      0 4px 6px rgba(0, 0, 0, 0.04),
+      0 8px 16px rgba(0, 0, 0, 0.02);
   }
   .shadow-card-hover {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 6px 10px rgba(0, 0, 0, 0.05), 0
-      12px 24px rgba(0, 0, 0, 0.03);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.05),
+      0 6px 10px rgba(0, 0, 0, 0.05),
+      0 12px 24px rgba(0, 0, 0, 0.03);
   }
 }

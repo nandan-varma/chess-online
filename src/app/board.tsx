@@ -3,22 +3,22 @@
  * Two-player chess game on the same device
  */
 
-'use client'
+'use client';
 
-import { Button } from '@/components/ui/button'
-import ChessBoardLogic from '@/components/ChessBoard'
-import { createFileRoute } from '@tanstack/react-router'
 import {
   faRotate,
   faRotateLeft,
   faRotateRight,
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import type { Square } from 'chess.js'
-import { Chess } from 'chess.js'
-import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
-import type { ChessMove, SquareStyles, VerboseMove } from '@/types'
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { createFileRoute } from '@tanstack/react-router';
+import type { Square } from 'chess.js';
+import { Chess } from 'chess.js';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+import Chessboard from '@/components/chessboard';
+import { Button } from '@/components/ui/button';
+import type { ChessMove, SquareStyles, VerboseMove } from '@/types';
 
 /**
  * Route configuration
@@ -36,16 +36,16 @@ export const Route = createFileRoute('/board')({
       },
     ],
   }),
-})
+});
 
 /**
  * Local board game component
  */
 function LocalBoard() {
-  const [fen, setFen] = useState('start')
-  const [game] = useState(() => new Chess())
-  const [squareStyles, setSquareStyles] = useState<SquareStyles>({})
-  const [undoneMove, setUndoneMove] = useState<ChessMove | null>(null)
+  const [fen, setFen] = useState('start');
+  const [game] = useState(() => new Chess());
+  const [squareStyles, setSquareStyles] = useState<SquareStyles>({});
+  const [undoneMove, setUndoneMove] = useState<ChessMove | null>(null);
 
   /**
    * Validate if a move is legal
@@ -54,10 +54,10 @@ function LocalBoard() {
     (move: ChessMove): boolean => {
       return game
         .moves({ square: move.from as Square, verbose: true })
-        .some((obj) => obj.to === move.to && obj.from === move.from)
+        .some((obj) => obj.to === move.to && obj.from === move.from);
     },
     [game]
-  )
+  );
 
   /**
    * Handle move
@@ -67,25 +67,25 @@ function LocalBoard() {
       if (!isValidMove(move)) {
         toast.error('Invalid move!', {
           description: 'Please make a valid move.',
-        })
-        return
+        });
+        return;
       }
 
-      game.move(move)
-      setFen(game.fen())
-      setSquareStyles({})
+      game.move(move);
+      setFen(game.fen());
+      setSquareStyles({});
 
       // Check game state
       if (game.isCheckmate()) {
-        toast.success('Checkmate!', { description: 'Game over.' })
+        toast.success('Checkmate!', { description: 'Game over.' });
       } else if (game.isDraw()) {
-        toast.info('Draw!', { description: 'The game is a draw.' })
+        toast.info('Draw!', { description: 'The game is a draw.' });
       } else if (game.isCheck()) {
-        toast.warning('Check!', { description: 'King is in check.' })
+        toast.warning('Check!', { description: 'King is in check.' });
       }
     },
     [isValidMove, game]
-  )
+  );
 
   /**
    * Handle pawn promotion
@@ -95,91 +95,91 @@ function LocalBoard() {
       const promotionPiece = prompt(
         'Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)',
         'q'
-      )
+      );
 
       if (promotionPiece) {
         const move: ChessMove = {
           from: sourceSquare,
           to: targetSquare,
           promotion: promotionPiece,
-        }
-        handleMove(move)
+        };
+        handleMove(move);
       }
     },
     [handleMove]
-  )
+  );
 
   /**
    * Show available moves on square hover
    */
   const onMouseOverSquare = useCallback(
     (square: Square): void => {
-      const moves: VerboseMove[] = game.moves({ square, verbose: true })
+      const moves: VerboseMove[] = game.moves({ square, verbose: true });
 
-      if (moves.length === 0) return
+      if (moves.length === 0) return;
 
-      const newStyles: SquareStyles = {}
+      const newStyles: SquareStyles = {};
       newStyles[square] = {
         background:
           'radial-gradient(circle, rgba(255,255,255,0.3) 36%, transparent 40%)',
         borderRadius: '50%',
-      }
+      };
 
       moves.forEach((move: VerboseMove) => {
         newStyles[move.to] = {
           background:
             'radial-gradient(circle, rgba(0,0,0,0.2) 36%, transparent 40%)',
           borderRadius: '50%',
-        }
-      })
+        };
+      });
 
-      setSquareStyles(newStyles)
+      setSquareStyles(newStyles);
     },
     [game]
-  )
+  );
 
   /**
    * Clear square styles on mouse out
    */
   const onMouseOutSquare = useCallback((): void => {
-    setSquareStyles({})
-  }, [])
+    setSquareStyles({});
+  }, []);
 
   /**
    * Reset game
    */
   const handleResetClick = useCallback(() => {
-    setSquareStyles({})
-    setUndoneMove(null)
-    game.reset()
-    setFen(game.fen())
-    toast.info('Game reset')
-  }, [game])
+    setSquareStyles({});
+    setUndoneMove(null);
+    game.reset();
+    setFen(game.fen());
+    toast.info('Game reset');
+  }, [game]);
 
   /**
    * Undo move
    */
   const handleUndoClick = useCallback(() => {
-    setSquareStyles({})
-    const move = game.undo()
+    setSquareStyles({});
+    const move = game.undo();
     if (move) {
-      setUndoneMove(move as ChessMove)
-      setFen(game.fen())
-      toast.info('Move undone')
+      setUndoneMove(move as ChessMove);
+      setFen(game.fen());
+      toast.info('Move undone');
     }
-  }, [game])
+  }, [game]);
 
   /**
    * Redo move
    */
   const handleRedoClick = useCallback(() => {
-    setSquareStyles({})
+    setSquareStyles({});
     if (undoneMove && isValidMove(undoneMove)) {
-      handleMove(undoneMove)
-      setUndoneMove(null)
-      toast.info('Move redone')
+      handleMove(undoneMove);
+      setUndoneMove(null);
+      toast.info('Move redone');
     }
-  }, [undoneMove, isValidMove, handleMove])
+  }, [undoneMove, isValidMove, handleMove]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -224,7 +224,7 @@ function LocalBoard() {
 
       <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-2 overflow-hidden">
         <div className="w-full aspect-square max-w-[90vmin]">
-          <ChessBoardLogic
+          <Chessboard
             fen={fen}
             squareStyles={squareStyles}
             onMouseOverSquare={(square: string) =>
@@ -232,30 +232,30 @@ function LocalBoard() {
             }
             onMouseOutSquare={onMouseOutSquare}
             onDrop={(move) => {
-              const piece = game.get(move.sourceSquare as Square)
+              const piece = game.get(move.sourceSquare as Square);
               const isPromotion =
                 (move.sourceSquare[1] === '7' &&
                   move.targetSquare[1] === '8' &&
                   piece?.type === 'p') ||
                 (move.sourceSquare[1] === '2' &&
                   move.targetSquare[1] === '1' &&
-                  piece?.type === 'p')
+                  piece?.type === 'p');
 
               if (isPromotion) {
                 handlePromotion(
                   move.sourceSquare as Square,
                   move.targetSquare as Square
-                )
+                );
               } else {
                 handleMove({
                   from: move.sourceSquare as Square,
                   to: move.targetSquare as Square,
-                })
+                });
               }
             }}
           />
         </div>
       </div>
     </div>
-  )
+  );
 }

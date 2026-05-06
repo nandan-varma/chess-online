@@ -2,17 +2,17 @@
  * Notification hook - Wrapper around Sonner toast for consistent notifications
  */
 
-import { toast as sonnerToast } from 'sonner'
+import { toast as sonnerToast } from 'sonner';
 
-export type NotificationType = 'success' | 'error' | 'info' | 'warning'
+export type NotificationType = 'success' | 'error' | 'info' | 'warning';
 
 interface NotificationOptions {
-  duration?: number
-  description?: string
+  duration?: number;
+  description?: string;
   action?: {
-    label: string
-    onClick: () => void
-  }
+    label: string;
+    onClick: () => void;
+  };
 }
 
 /**
@@ -28,20 +28,20 @@ export const useNotification = () => {
       duration: options.duration || 4000,
       description: options.description,
       action: options.action,
-    }
+    };
 
     switch (type) {
       case 'success':
-        return sonnerToast.success(message, baseOptions)
+        return sonnerToast.success(message, baseOptions);
       case 'error':
-        return sonnerToast.error(message, baseOptions)
+        return sonnerToast.error(message, baseOptions);
       case 'warning':
-        return sonnerToast.warning(message, baseOptions)
+        return sonnerToast.warning(message, baseOptions);
       case 'info':
       default:
-        return sonnerToast.message(message, baseOptions)
+        return sonnerToast.message(message, baseOptions);
     }
-  }
+  };
 
   return {
     success: (message: string, options?: NotificationOptions) =>
@@ -52,5 +52,5 @@ export const useNotification = () => {
       showNotification(message, 'warning', options),
     info: (message: string, options?: NotificationOptions) =>
       showNotification(message, 'info', options),
-  }
-}
+  };
+};
