@@ -1,6 +1,7 @@
 /**
  * Enhanced Navigation Bar component
  * Displays navigation with breadcrumbs, back button, and user menu
+ * Uses brand colors and design system components throughout
  */
 
 'use client';
@@ -16,6 +17,7 @@ import {
   Menu,
   Gamepad2,
   User as UserIcon,
+  Zap,
 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -34,6 +36,7 @@ import { getGameRoutes } from '@/lib/navigation';
 
 /**
  * Navigation breadcrumb component
+ * Shows navigation hierarchy with brand styling
  */
 function Breadcrumbs({
   items,
@@ -44,10 +47,12 @@ function Breadcrumbs({
     <div className="hidden md:flex items-center gap-1 text-sm text-muted-foreground">
       {items.map((item, index) => (
         <div key={item.href} className="flex items-center gap-1">
-          {index > 0 && <ChevronRight className="h-4 w-4" />}
+          {index > 0 && (
+            <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+          )}
           <Link
             to={item.href}
-            className="hover:text-foreground transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded-md text-muted-foreground hover:text-primary hover:bg-accent/50 transition-all duration-200 font-medium"
           >
             {item.label}
           </Link>
@@ -59,6 +64,7 @@ function Breadcrumbs({
 
 /**
  * Enhanced navigation bar component
+ * Uses brand colors and design system components throughout
  */
 const NavBar: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -95,7 +101,7 @@ const NavBar: React.FC = () => {
   const isGamePage = currentPath.startsWith('/board') || currentPath.startsWith('/vs-ai');
 
   return (
-    <nav className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
+    <nav className="sticky top-0 z-40 w-full bg-gradient-to-r from-background to-background/95 border-b border-border/50 shadow-card backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Main nav row */}
         <div className="flex h-16 items-center justify-between gap-4">
@@ -106,7 +112,7 @@ const NavBar: React.FC = () => {
                 variant="ghost"
                 size="icon"
                 onClick={goBack}
-                className="h-10 w-10 shrink-0"
+                className="h-10 w-10 shrink-0 text-muted-foreground hover:text-primary hover:bg-primary/10 active:bg-primary/20"
                 title="Go back"
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -115,13 +121,15 @@ const NavBar: React.FC = () => {
 
             <Link
               to="/"
-              className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 shrink-0 group"
             >
-              <Gamepad2 className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold tracking-tight hidden sm:inline">
+              <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-3d-sm group-hover:shadow-3d transition-all duration-200 active:shadow-sm">
+                <Gamepad2 className="h-5 w-5" />
+              </div>
+              <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent hidden sm:inline">
                 Chess Online
               </span>
-              <span className="text-lg font-bold tracking-tight sm:hidden">
+              <span className="text-lg font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent sm:hidden">
                 Chess
               </span>
             </Link>
@@ -143,8 +151,8 @@ const NavBar: React.FC = () => {
                   <>
                     {/* Game links for authenticated users */}
                     {!isGamePage && (
-                      <div className="flex items-center gap-1 border-r pr-2 mr-2">
-                        {gameRoutes.map((route) => (
+                      <div className="flex items-center gap-1 border-r border-border/50 pr-3 mr-2">
+                        {gameRoutes.map((route, index) => (
                           <Link key={route.to} to={route.to}>
                             <Button
                               variant={
@@ -153,9 +161,14 @@ const NavBar: React.FC = () => {
                                   : 'ghost'
                               }
                               size="sm"
-                              className="text-xs sm:text-sm"
+                              className="text-xs sm:text-sm gap-1.5 group"
                               title={route.description}
                             >
+                              {index === 0 ? (
+                                <Home className="h-3.5 w-3.5" />
+                              ) : (
+                                <Zap className="h-3.5 w-3.5" />
+                              )}
                               {route.label}
                             </Button>
                           </Link>
@@ -172,34 +185,42 @@ const NavBar: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="gap-2"
+                          className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10"
                         >
-                          <UserIcon className="h-4 w-4" />
+                          <div className="p-1 rounded-md bg-primary/10 text-primary">
+                            <UserIcon className="h-4 w-4" />
+                          </div>
                           <span className="max-w-[150px] truncate text-sm hidden sm:inline">
                             {user.email}
                           </span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuContent align="end" className="w-56 shadow-3d-lg border-border/50">
                         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                           Signed in as
                         </DropdownMenuLabel>
-                        <DropdownMenuLabel className="text-sm font-semibold truncate">
+                        <DropdownMenuLabel className="text-sm font-semibold text-primary truncate">
                           {user.email}
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground py-1">
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        <DropdownMenuLabel className="text-xs font-semibold text-primary py-1 flex items-center gap-1">
+                          <Gamepad2 className="h-3 w-3" />
                           GAMES
                         </DropdownMenuLabel>
                         {gameRoutes.map((route) => (
-                          <DropdownMenuItem key={route.to} asChild>
-                            <Link to={route.to} className="cursor-pointer">
+                          <DropdownMenuItem key={route.to} asChild className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5">
+                            <Link to={route.to} className="flex items-center gap-2">
+                              {gameRoutes.indexOf(route) === 0 ? (
+                                <Home className="h-3.5 w-3.5" />
+                              ) : (
+                                <Zap className="h-3.5 w-3.5" />
+                              )}
                               {route.label}
                             </Link>
                           </DropdownMenuItem>
                         ))}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5">
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Log out</span>
                         </DropdownMenuItem>
@@ -209,12 +230,15 @@ const NavBar: React.FC = () => {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Link to="/login">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary hover:bg-primary/10">
                         Log In
                       </Button>
                     </Link>
                     <Link to="/signup">
-                      <Button size="sm">Sign Up</Button>
+                      <Button size="sm" className="gap-1.5 shadow-3d-sm hover:shadow-sm">
+                        <Zap className="h-4 w-4" />
+                        <span>Sign Up</span>
+                      </Button>
                     </Link>
                   </div>
                 )}
@@ -230,53 +254,62 @@ const NavBar: React.FC = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-10 w-10"
+                      className="h-10 w-10 text-muted-foreground hover:text-primary hover:bg-primary/10"
                     >
                       <Menu className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-56 shadow-3d-lg border-border/50">
                     {user ? (
                       <>
                         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                           Signed in as
                         </DropdownMenuLabel>
-                        <DropdownMenuLabel className="text-sm font-semibold truncate">
+                        <DropdownMenuLabel className="text-sm font-semibold text-primary truncate">
                           {user.email}
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground py-1">
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        <DropdownMenuLabel className="text-xs font-semibold text-primary py-1 flex items-center gap-1">
+                          <Gamepad2 className="h-3 w-3" />
                           GAMES
                         </DropdownMenuLabel>
                         {gameRoutes.map((route) => (
                           <DropdownMenuItem
                             key={route.to}
                             asChild
-                            className="cursor-pointer"
+                            className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5"
                           >
-                            <Link to={route.to}>
+                            <Link to={route.to} className="flex items-center gap-2">
+                              {gameRoutes.indexOf(route) === 0 ? (
+                                <Home className="h-3.5 w-3.5" />
+                              ) : (
+                                <Zap className="h-3.5 w-3.5" />
+                              )}
                               {route.label}
                             </Link>
                           </DropdownMenuItem>
                         ))}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleLogout}>
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5">
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Log out</span>
                         </DropdownMenuItem>
                       </>
                     ) : (
                       <>
-                        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground py-1">
+                        <DropdownMenuLabel className="text-xs font-semibold text-primary py-1 flex items-center gap-1">
+                          <UserIcon className="h-3 w-3" />
                           ACCOUNT
                         </DropdownMenuLabel>
-                        <DropdownMenuItem asChild className="cursor-pointer">
-                          <Link to="/login">
+                        <DropdownMenuItem asChild className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5">
+                          <Link to="/login" className="flex items-center gap-2">
+                            <Home className="h-3.5 w-3.5" />
                             Log In
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer">
-                          <Link to="/signup">
+                        <DropdownMenuItem asChild className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5">
+                          <Link to="/signup" className="flex items-center gap-2">
+                            <Zap className="h-3.5 w-3.5" />
                             Sign Up
                           </Link>
                         </DropdownMenuItem>
@@ -290,11 +323,13 @@ const NavBar: React.FC = () => {
         </div>
 
         {/* Page title row (mobile only) */}
-        <div className="md:hidden -mx-4 px-4 py-2 border-t bg-muted/30">
-          <div className="flex items-center gap-2">
-            <Home className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <div className="md:hidden -mx-4 px-4 py-3 border-t border-border/50 bg-primary/5">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10 text-primary flex-shrink-0">
+              <Home className="h-4 w-4" />
+            </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">
+              <p className="text-sm font-semibold text-primary truncate">
                 {metadata.title}
               </p>
               {metadata.description && (
