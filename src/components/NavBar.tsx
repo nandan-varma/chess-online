@@ -32,7 +32,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { auth } from '@/lib/firebase';
 import { useNavigation } from '@/hooks/useNavigation';
-import { getGameRoutes } from '@/lib/navigation';
 
 /**
  * Navigation breadcrumb component
@@ -95,7 +94,6 @@ const NavBar: React.FC = () => {
     }
   };
 
-  const gameRoutes = getGameRoutes();
   const showBackButton = metadata.showBackButton && currentPath !== '/';
   const isAuthPage = currentPath === '/login' || currentPath === '/signup';
   const isGamePage = currentPath.startsWith('/board') || currentPath.startsWith('/vs-ai');
@@ -149,32 +147,6 @@ const NavBar: React.FC = () => {
               <div className="hidden md:flex items-center gap-2">
                 {user ? (
                   <>
-                    {/* Game links for authenticated users */}
-                    {!isGamePage && (
-                      <div className="flex items-center gap-1 border-r border-border/50 pr-3 mr-2">
-                        {gameRoutes.map((route, index) => (
-                          <Link key={route.to} to={route.to}>
-                            <Button
-                              variant={
-                                currentPath === route.to
-                                  ? 'default'
-                                  : 'ghost'
-                              }
-                              size="sm"
-                              className="text-xs sm:text-sm gap-1.5 group"
-                              title={route.description}
-                            >
-                              {index === 0 ? (
-                                <Home className="h-3.5 w-3.5" />
-                              ) : (
-                                <Zap className="h-3.5 w-3.5" />
-                              )}
-                              {route.label}
-                            </Button>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
 
                     {/* User menu */}
                     <DropdownMenu
@@ -202,23 +174,6 @@ const NavBar: React.FC = () => {
                         <DropdownMenuLabel className="text-sm font-semibold text-primary truncate">
                           {user.email}
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuLabel className="text-xs font-semibold text-primary py-1 flex items-center gap-1">
-                          <Gamepad2 className="h-3 w-3" />
-                          GAMES
-                        </DropdownMenuLabel>
-                        {gameRoutes.map((route) => (
-                          <DropdownMenuItem key={route.to} asChild className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5">
-                            <Link to={route.to} className="flex items-center gap-2">
-                              {gameRoutes.indexOf(route) === 0 ? (
-                                <Home className="h-3.5 w-3.5" />
-                              ) : (
-                                <Zap className="h-3.5 w-3.5" />
-                              )}
-                              {route.label}
-                            </Link>
-                          </DropdownMenuItem>
-                        ))}
                         <DropdownMenuSeparator className="bg-border/50" />
                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5">
                           <LogOut className="mr-2 h-4 w-4" />
@@ -269,26 +224,6 @@ const NavBar: React.FC = () => {
                           {user.email}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuLabel className="text-xs font-semibold text-primary py-1 flex items-center gap-1">
-                          <Gamepad2 className="h-3 w-3" />
-                          GAMES
-                        </DropdownMenuLabel>
-                        {gameRoutes.map((route) => (
-                          <DropdownMenuItem
-                            key={route.to}
-                            asChild
-                            className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5"
-                          >
-                            <Link to={route.to} className="flex items-center gap-2">
-                              {gameRoutes.indexOf(route) === 0 ? (
-                                <Home className="h-3.5 w-3.5" />
-                              ) : (
-                                <Zap className="h-3.5 w-3.5" />
-                              )}
-                              {route.label}
-                            </Link>
-                          </DropdownMenuItem>
-                        ))}
                         <DropdownMenuSeparator className="bg-border/50" />
                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5">
                           <LogOut className="mr-2 h-4 w-4" />
