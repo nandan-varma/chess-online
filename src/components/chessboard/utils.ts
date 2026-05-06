@@ -24,7 +24,7 @@ export function fenToPosition(fen: string): Position {
 
       if (char >= '1' && char <= '8') {
         file += Number.parseInt(char, 10);
-      } else if (char >= 'a' && char <= 'z' || char >= 'A' && char <= 'Z') {
+      } else if ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')) {
         const color = char === char.toUpperCase() ? 'w' : 'b';
         const pieceType = char.toLowerCase();
         const square = `${FILES[file]}${8 - rank}` as Square;

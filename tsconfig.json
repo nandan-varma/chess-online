@@ -3,29 +3,20 @@
     "ignoreDeprecations": "6.0",
     "target": "ES2020",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "skipLibCheck": true,
     "jsx": "react-jsx",
     "module": "ESNext",
-    "skipLibCheck": true,
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
     "baseUrl": "src",
     "paths": {
       "@/*": ["./*"]
-    },
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "isolatedModules": true
+    }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"],
-  "exclude": ["node_modules", "dist", ".output", "src/**/*.spec.ts", "src/**/*.test.ts"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

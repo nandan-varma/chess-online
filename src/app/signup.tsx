@@ -3,9 +3,13 @@
  * User registration with email and password
  */
 
-'use client'
+'use client';
 
-import { Button } from '@/components/ui/button'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,14 +17,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { auth } from '@/lib/firebase'
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { auth } from '@/lib/firebase';
 
 /**
  * Route configuration
@@ -38,18 +38,18 @@ export const Route = createFileRoute('/signup')({
       },
     ],
   }),
-})
+});
 
 /**
  * Signup page component
  */
 function SignupPage() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   /**
    * Handle signup
@@ -57,42 +57,43 @@ function SignupPage() {
   const handleSignup = useCallback(async () => {
     // Validation
     if (!email || !password || !confirmPassword) {
-      setError('Please fill in all fields')
-      return
+      setError('Please fill in all fields');
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError('Passwords do not match');
+      return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters')
-      return
+      setError('Password must be at least 6 characters');
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      await createUserWithEmailAndPassword(auth, email, password);
       toast.success('Account created!', {
         description: 'Welcome to Chess Online!',
-      })
-      navigate({ to: '/' })
+      });
+      navigate({ to: '/' });
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Failed to create account. Please try again.'
-      setError(errorMessage)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to create account. Please try again.';
+      setError(errorMessage);
       toast.error('Signup failed!', {
         description: errorMessage,
-      })
-      console.error('Signup error:', error)
+      });
+      console.error('Signup error:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [email, password, confirmPassword, navigate])
+  }, [email, password, confirmPassword, navigate]);
 
   /**
    * Handle Enter key press
@@ -100,11 +101,11 @@ function SignupPage() {
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') {
-        handleSignup()
+        handleSignup();
       }
     },
     [handleSignup]
-  )
+  );
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -123,8 +124,8 @@ function SignupPage() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => {
-                  setEmail(e.target.value)
-                  setError(null)
+                  setEmail(e.target.value);
+                  setError(null);
                 }}
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
@@ -138,8 +139,8 @@ function SignupPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => {
-                  setPassword(e.target.value)
-                  setError(null)
+                  setPassword(e.target.value);
+                  setError(null);
                 }}
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
@@ -153,8 +154,8 @@ function SignupPage() {
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => {
-                  setConfirmPassword(e.target.value)
-                  setError(null)
+                  setConfirmPassword(e.target.value);
+                  setError(null);
                 }}
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
@@ -185,5 +186,5 @@ function SignupPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

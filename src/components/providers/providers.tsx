@@ -3,17 +3,18 @@
  * Centralized configuration for all providers
  */
 
-'use client'
+'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import React, { ReactNode, useMemo } from 'react'
-import { DndProvider } from 'react-dnd'
-import { HTML5Backend } from 'react-dnd-html5-backend'
-import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import type React from 'react';
+import { type ReactNode, useMemo } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
 interface ProvidersProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
@@ -32,15 +33,14 @@ function createQueryClient() {
         // Retry failed requests once
         retry: 1,
         // Set reasonable timeout
-        retryDelay: (attemptIndex) =>
-          Math.min(1000 * 2 ** attemptIndex, 30000),
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
       },
       mutations: {
         // Retry mutations once on failure
         retry: 1,
       },
     },
-  })
+  });
 }
 
 /**
@@ -49,7 +49,7 @@ function createQueryClient() {
  */
 export const Providers: React.FC<ProvidersProps> = ({ children }) => {
   // Create QueryClient once and reuse it
-  const queryClient = useMemo(() => createQueryClient(), [])
+  const queryClient = useMemo(() => createQueryClient(), []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -63,7 +63,7 @@ export const Providers: React.FC<ProvidersProps> = ({ children }) => {
         </ThemeProvider>
       </DndProvider>
     </QueryClientProvider>
-  )
-}
+  );
+};
 
-export default Providers
+export default Providers;

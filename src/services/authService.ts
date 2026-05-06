@@ -5,14 +5,14 @@
 
 import {
   createUserWithEmailAndPassword,
+  onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
   updateProfile,
-} from 'firebase/auth'
-import { auth, database } from '@/lib/firebase'
-import { ref, set, get } from 'firebase/database'
-import type { User, LoginCredentials, SignupCredentials } from '@/types/auth'
+} from 'firebase/auth';
+import { get, ref, set } from 'firebase/database';
+import { auth, database } from '@/lib/firebase';
+import type { LoginCredentials, SignupCredentials, User } from '@/types/auth';
 
 class AuthService {
   /**
@@ -23,22 +23,22 @@ class AuthService {
       const unsubscribe = onAuthStateChanged(
         auth,
         async (firebaseUser) => {
-          unsubscribe()
+          unsubscribe();
           if (!firebaseUser) {
-            resolve(null)
-            return
+            resolve(null);
+            return;
           }
 
           try {
-            const userDoc = await this.getUserFromDatabase(firebaseUser.uid)
-            resolve(userDoc)
+            const userDoc = await this.getUserFromDatabase(firebaseUser.uid);
+            resolve(userDoc);
           } catch (error) {
-            reject(error)
+            reject(error);
           }
         },
         reject
-      )
-    })
+      );
+    });
   }
 
   /**
@@ -49,9 +49,9 @@ class AuthService {
       auth,
       credentials.email,
       credentials.password
-    )
+    );
 
-    return this.getUserFromDatabase(firebaseUser.uid)
+    return this.getUserFromDatabase(firebaseUser.uid);
   }
 
   /**
@@ -62,7 +62,7 @@ class AuthService {
       auth,
       credentials.email,
       credentials.password
-    )
+    );
 
     // Create user profile in Realtime Database
     const userData: User = {
@@ -72,64 +72,64 @@ class AuthService {
       photoURL: null,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    await set(ref(database, `users/${firebaseUser.uid}`), userData)
+    await set(ref(database, `users/${firebaseUser.uid}`), userData);
 
     // Update Firebase Auth profile
     if (credentials.displayName) {
       await updateProfile(firebaseUser, {
         displayName: credentials.displayName,
-      })
+      });
     }
 
-    return userData
+    return userData;
   }
 
   /**
    * Logout current user
    */
   async logout(): Promise<void> {
-    await signOut(auth)
+    await signOut(auth);
   }
 
   /**
    * Update user profile
    */
   async updateProfile(data: Partial<User>): Promise<User> {
-    const firebaseUser = auth.currentUser
+    const firebaseUser = auth.currentUser;
     if (!firebaseUser) {
-      throw new Error('No authenticated user')
+      throw new Error('No authenticated user');
     }
 
-    const userRef = ref(database, `users/${firebaseUser.uid}`)
+    const userRef = ref(database, `users/${firebaseUser.uid}`);
     const updatedData = {
       ...data,
       updatedAt: new Date(),
-    }
+    };
 
-    await set(userRef, updatedData)
+    await set(userRef, updatedData);
 
     // Update Firebase Auth profile if display name changed
     if (data.displayName && data.displayName !== firebaseUser.displayName) {
       await updateProfile(firebaseUser, {
         displayName: data.displayName,
-      })
+      });
     }
 
-    return this.getUserFromDatabase(firebaseUser.uid)
+    return this.getUserFromDatabase(firebaseUser.uid);
   }
 
   /**
    * Helper: Get user from Realtime Database
    */
   private async getUserFromDatabase(uid: string): Promise<User> {
-    const snapshot = await get(ref(database, `users/${uid}`))
+    const snapshot = await get(ref(database, `users/${uid}`));
     if (!snapshot.exists()) {
-      throw new Error('User not found')
+      throw new Error('User not found');
     }
-    return snapshot.val() as User
+    return snapshot.val() as User;
   }
 }
 
-export const authService = new AuthService()
+export const authService = new AuthService();

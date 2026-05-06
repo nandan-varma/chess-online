@@ -3,9 +3,9 @@
  * Handles Firebase setup with proper error handling and singleton pattern
  */
 
-import { getApp, getApps, initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
-import { getDatabase } from 'firebase/database'
+import { getApp, getApps, initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getDatabase } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_PUBLIC_FIREBASE_API_KEY,
@@ -15,42 +15,37 @@ const firebaseConfig = {
   storageBucket: import.meta.env.VITE_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: import.meta.env.VITE_PUBLIC_FIREBASE_APP_ID,
-} as const
+} as const;
 
 /**
  * Validate that all required Firebase config values are present
  */
 const validateFirebaseConfig = (): void => {
-  const requiredKeys = [
-    'apiKey',
-    'authDomain',
-    'projectId',
-    'appId',
-  ] as const
+  const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'appId'] as const;
 
   for (const key of requiredKeys) {
     if (!firebaseConfig[key]) {
-      console.warn(`Missing Firebase config: ${key}`)
+      console.warn(`Missing Firebase config: ${key}`);
     }
   }
-}
+};
 
 // Validate on module load
-validateFirebaseConfig()
+validateFirebaseConfig();
 
 /**
  * Initialize Firebase app (singleton pattern)
  */
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp()
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 /**
  * Firebase Auth instance
  */
-const auth = getAuth(app)
+const auth = getAuth(app);
 
 /**
  * Firebase Realtime Database instance
  */
-const database = getDatabase(app)
+const database = getDatabase(app);
 
-export { app, auth, database }
+export { app, auth, database };

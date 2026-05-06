@@ -3,9 +3,13 @@
  * User authentication with email and password
  */
 
-'use client'
+'use client';
 
-import { Button } from '@/components/ui/button'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,14 +17,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { auth } from '@/lib/firebase'
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { auth } from '@/lib/firebase';
 
 /**
  * Route configuration
@@ -38,49 +38,50 @@ export const Route = createFileRoute('/login')({
       },
     ],
   }),
-})
+});
 
 /**
  * Login page component
  */
 function LoginPage() {
-  const navigate = useNavigate()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   /**
    * Handle login
    */
   const handleLogin = useCallback(async () => {
     if (!email || !password) {
-      setError('Please fill in all fields')
-      return
+      setError('Please fill in all fields');
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(auth, email, password);
       toast.success('Login successful!', {
         description: 'Welcome back!',
-      })
-      navigate({ to: '/' })
+      });
+      navigate({ to: '/' });
     } catch (error) {
-      const errorMessage = error instanceof Error
-        ? error.message
-        : 'Failed to login. Please try again.'
-      setError(errorMessage)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to login. Please try again.';
+      setError(errorMessage);
       toast.error('Login failed!', {
         description: errorMessage,
-      })
-      console.error('Login error:', error)
+      });
+      console.error('Login error:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [email, password, navigate])
+  }, [email, password, navigate]);
 
   /**
    * Handle Enter key press
@@ -88,11 +89,11 @@ function LoginPage() {
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter') {
-        handleLogin()
+        handleLogin();
       }
     },
     [handleLogin]
-  )
+  );
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -111,8 +112,8 @@ function LoginPage() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => {
-                  setEmail(e.target.value)
-                  setError(null)
+                  setEmail(e.target.value);
+                  setError(null);
                 }}
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
@@ -126,8 +127,8 @@ function LoginPage() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => {
-                  setPassword(e.target.value)
-                  setError(null)
+                  setPassword(e.target.value);
+                  setError(null);
                 }}
                 onKeyPress={handleKeyPress}
                 disabled={isLoading}
@@ -158,5 +159,5 @@ function LoginPage() {
         </div>
       </Card>
     </div>
-  )
+  );
 }

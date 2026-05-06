@@ -22,7 +22,8 @@ export interface Position {
 export interface ChessboardProps {
   id?: string;
   width?: number;
-  position: string | Position; // FEN string or position object
+  position?: string | Position; // FEN string or position object
+  fen?: string; // Alias for position (FEN string)
   orientation?: 'white' | 'black';
   draggable?: boolean;
   onDrop?: (move: { sourceSquare: Square; targetSquare: Square }) => void;

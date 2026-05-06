@@ -1,3 +1,2 @@
-export { default } from './Chessboard';
-export { default as Chessboard } from './Chessboard';
+export { default, default as Chessboard } from './Chessboard';
 export * from './types';
