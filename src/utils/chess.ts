@@ -32,7 +32,8 @@ export const getPieceValue = (piece: string): number => {
  */
 export const isLightSquare = (square: string): boolean => {
   const file = square.charCodeAt(0) - 97 // a-h to 0-7
-  const rank = parseInt(square[1]) - 1 // 1-8 to 0-7
+  const rankChar = square.charAt(1)
+  const rank = rankChar ? parseInt(rankChar) - 1 : -1 // 1-8 to 0-7
   return (file + rank) % 2 === 0
 }
 
@@ -47,8 +48,13 @@ export const getSquareColor = (square: string): 'light' | 'dark' => {
  * Convert algebraic notation to coordinates
  */
 export const algebraicToCoords = (square: string): [number, number] => {
+  if (!square || square.length < 2) {
+    throw new Error(`Invalid square: ${square}`)
+  }
   const file = square.charCodeAt(0) - 97 // a=0, h=7
-  const rank = 8 - parseInt(square[1]) // 8=0, 1=7
+  const rankChar = square.charAt(1)
+  if (!rankChar) throw new Error(`Invalid square format: ${square}`)
+  const rank = 8 - parseInt(rankChar)
   return [rank, file]
 }
 
@@ -140,5 +146,5 @@ export const formatMoveAsNotation = (
     return to // Pawns don't include piece letter
   }
 
-  return `${pieceName[0]}${from}${to}`
+  return `${pieceName[0]!}${from}${to}`
 }

@@ -1,8 +1,8 @@
 /**
- * Debounce hook - Debounce value changes
+ * Debounce hook - Debounce value changes and callbacks
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * Debounce a value - useful for search inputs and expensive operations
@@ -24,19 +24,21 @@ export const useDebounce = <T,>(value: T, delayMs: number = 500): T => {
 /**
  * Debounce a callback function
  */
-export const useDebouncedCallback = <T extends (...args: any[]) => any>(
+export const useDebouncedCallback = <T extends (...args: unknown[]) => void | Promise<void>>(
   callback: T,
   delayMs: number = 500
-): ((...args: Parameters<T>) => void) => {
-  const [lastCall, setLastCall] = useState<NodeJS.Timeout | null>(null)
+): T => {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  return (...args: Parameters<T>) => {
-    if (lastCall) clearTimeout(lastCall)
+  const debouncedCallback = ((...args: unknown[]) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
 
-    const newCall = setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       callback(...args)
     }, delayMs)
+  }) as T
 
-    setLastCall(newCall)
-  }
+  return debouncedCallback
 }

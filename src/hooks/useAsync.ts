@@ -10,8 +10,8 @@ interface AsyncState<T> {
   error: Error | null
 }
 
-interface UseAsyncOptions {
-  onSuccess?: (data: unknown) => void
+interface UseAsyncOptions<T = void> {
+  onSuccess?: (data: T) => void | Promise<void>
   onError?: (error: Error) => void
   dependencies?: React.DependencyList
 }
@@ -21,7 +21,7 @@ interface UseAsyncOptions {
  */
 export const useAsync = <T,>(
   fn: () => Promise<T>,
-  options: UseAsyncOptions = {}
+  options: UseAsyncOptions<T> = {}
 ): AsyncState<T> & { retry: () => void } => {
   const [state, setState] = useState<AsyncState<T>>({
     data: null,

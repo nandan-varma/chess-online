@@ -8,7 +8,7 @@ import { errorService } from '@/services/errorService'
 export interface RequestConfig {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   headers?: Record<string, string>
-  body?: unknown
+  body?: Record<string, unknown> | FormData
   timeout?: number
 }
 
@@ -16,6 +16,16 @@ export interface HttpResponse<T> {
   data: T
   status: number
   headers: Headers
+}
+
+/**
+ * Type guard for JSON-serializable data
+ */
+const isJsonSerializable = (data: unknown): data is Record<string, unknown> | null => {
+  return (
+    typeof data === 'object' &&
+    (data === null || Array.isArray(data) || !(data instanceof FormData))
+  )
 }
 
 class HttpClient {
@@ -58,37 +68,63 @@ class HttpClient {
     const timeoutId = setTimeout(() => controller.abort(), this.timeout)
 
     try {
-      const response = await fetch(url, {
+      const fetchConfig: RequestInit = {
         method: config.method || 'GET',
         headers: { ...this.defaultHeaders, ...config.headers },
-        body: config.body ? JSON.stringify(config.body) : undefined,
         signal: controller.signal,
-      })
+      }
+
+      // Handle body serialization
+      if (config.body) {
+        if (config.body instanceof FormData) {
+          fetchConfig.body = config.body
+          // Remove Content-Type for FormData (browser will set it automatically)
+          if (fetchConfig.headers && typeof fetchConfig.headers === 'object' && 'Content-Type' in fetchConfig.headers) {
+            const headers = fetchConfig.headers as Record<string, string>
+            delete headers['Content-Type']
+          }
+        } else if (isJsonSerializable(config.body)) {
+          fetchConfig.body = JSON.stringify(config.body)
+        }
+      }
+
+      const response = await fetch(url, fetchConfig)
 
       clearTimeout(timeoutId)
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const context: Record<string, string | number | boolean> = { endpoint }
+        if (config.method) {
+          context.method = config.method
+        }
+        errorService.handleError(error, context)
+        throw error
       }
 
-      const data = await response.json()
+      const data = (await response.json()) as T
 
       return {
-        data: data as T,
+        data,
         status: response.status,
         headers: response.headers,
       }
     } catch (error) {
       clearTimeout(timeoutId)
-      errorService.handleError(error, { endpoint, config })
-      throw error
+      const context: Record<string, string | number | boolean> = { endpoint }
+      if (config.method) {
+        context.method = config.method
+      }
+      const err = error instanceof Error ? error : new Error(String(error))
+      errorService.handleError(err, context)
+      throw err
     }
   }
 
   /**
    * GET request
    */
-  async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
+  async get<T>(endpoint: string, config?: Omit<RequestConfig, 'body'>): Promise<T> {
     const response = await this.request<T>(endpoint, { ...config, method: 'GET' })
     return response.data
   }
@@ -98,8 +134,8 @@ class HttpClient {
    */
   async post<T>(
     endpoint: string,
-    body?: unknown,
-    config?: RequestConfig
+    body?: Record<string, unknown> | FormData,
+    config?: Omit<RequestConfig, 'body'>
   ): Promise<T> {
     const response = await this.request<T>(endpoint, {
       ...config,
@@ -114,8 +150,8 @@ class HttpClient {
    */
   async put<T>(
     endpoint: string,
-    body?: unknown,
-    config?: RequestConfig
+    body?: Record<string, unknown> | FormData,
+    config?: Omit<RequestConfig, 'body'>
   ): Promise<T> {
     const response = await this.request<T>(endpoint, {
       ...config,
@@ -128,7 +164,7 @@ class HttpClient {
   /**
    * DELETE request
    */
-  async delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
+  async delete<T>(endpoint: string, config?: Omit<RequestConfig, 'body'>): Promise<T> {
     const response = await this.request<T>(endpoint, { ...config, method: 'DELETE' })
     return response.data
   }
@@ -138,8 +174,8 @@ class HttpClient {
    */
   async patch<T>(
     endpoint: string,
-    body?: unknown,
-    config?: RequestConfig
+    body?: Record<string, unknown> | FormData,
+    config?: Omit<RequestConfig, 'body'>
   ): Promise<T> {
     const response = await this.request<T>(endpoint, {
       ...config,

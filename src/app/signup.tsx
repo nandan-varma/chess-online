@@ -80,9 +80,10 @@ function SignupPage() {
         description: 'Welcome to Chess Online!',
       })
       navigate({ to: '/' })
-    } catch (error: any) {
-      const errorMessage =
-        error.message || 'Failed to create account. Please try again.'
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Failed to create account. Please try again.'
       setError(errorMessage)
       toast.error('Signup failed!', {
         description: errorMessage,

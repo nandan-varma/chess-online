@@ -68,8 +68,10 @@ function LoginPage() {
         description: 'Welcome back!',
       })
       navigate({ to: '/' })
-    } catch (error: any) {
-      const errorMessage = error.message || 'Failed to login. Please try again.'
+    } catch (error) {
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'Failed to login. Please try again.'
       setError(errorMessage)
       toast.error('Login failed!', {
         description: errorMessage,
