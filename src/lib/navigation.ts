@@ -83,24 +83,6 @@ export function getRouteMetadata(path: string): RouteMetadata {
 }
 
 /**
- * Get game routes for authenticated users
- */
-export function getGameRoutes() {
-  return [
-    {
-      label: 'Local Game',
-      to: NAVIGATION_ROUTES.BOARD,
-      description: 'Play with a friend on same device',
-    },
-    {
-      label: 'Play AI',
-      to: NAVIGATION_ROUTES.VS_AI,
-      description: 'Challenge the computer',
-    },
-  ];
-}
-
-/**
  * Parse pathname to get breadcrumb items
  */
 export function generateBreadcrumbs(pathname: string): Array<{ label: string; href: string }> {
