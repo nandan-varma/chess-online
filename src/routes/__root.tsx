@@ -22,12 +22,10 @@ export const Route = createRootRoute({
  */
 function RootLayout(): React.ReactElement {
   return (
-    <>
-      <Providers>
-        <NavBar />
-        <Outlet />
-        <Toaster />
-      </Providers>
-    </>
+    <Providers>
+      <NavBar />
+      <Outlet />
+      <Toaster />
+    </Providers>
   );
 }

@@ -34,6 +34,7 @@ export function PieceIcon({ piece, size }: PieceIconProps): React.ReactElement {
         justifyContent: 'center',
         pointerEvents: 'none',
       }}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG content is hardcoded, not user input
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );

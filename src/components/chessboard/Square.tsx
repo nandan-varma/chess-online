@@ -71,6 +71,21 @@ function SquareComponent({
     onMouseOut?.(square);
   };
 
+  const handleFocus = () => {
+    onMouseOver?.(square);
+  };
+
+  const handleBlur = () => {
+    onMouseOut?.(square);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSquareClick?.(square);
+    }
+  };
+
   const handleDragStart = (e: React.DragEvent) => {
     if (piece && draggable && onDragStart) {
       e.dataTransfer.effectAllowed = 'move';
@@ -91,24 +106,34 @@ function SquareComponent({
   };
 
   return (
-    <div
-      style={baseSquareStyle}
+    <button
+      type="button"
+      style={{
+        ...baseSquareStyle,
+        border: 'none',
+        padding: 0,
+        outline: 'none',
+        fontFamily: 'inherit',
+      }}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       onContextMenu={handleContextMenu}
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       data-square={square}
-      role="gridcell"
       aria-label={`${square}${piece ? `, ${piece}` : ''}`}
-      tabIndex={0}
     >
       {/* Overlay for move indicators */}
       {squareStyle && <div style={overlayStyle} />}
 
       {piece && (
         <div
+          role="img"
+          aria-label={piece}
           draggable={draggable}
           onDragStart={handleDragStart}
           style={{
@@ -135,7 +160,7 @@ function SquareComponent({
           <PieceIcon piece={piece} size={squareSize * 0.85} />
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

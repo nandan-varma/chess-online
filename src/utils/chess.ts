@@ -33,7 +33,7 @@ export const getPieceValue = (piece: string): number => {
 export const isLightSquare = (square: string): boolean => {
   const file = square.charCodeAt(0) - 97; // a-h to 0-7
   const rankChar = square.charAt(1);
-  const rank = rankChar ? parseInt(rankChar) - 1 : -1; // 1-8 to 0-7
+  const rank = rankChar ? parseInt(rankChar, 10) - 1 : -1; // 1-8 to 0-7
   return (file + rank) % 2 === 0;
 };
 
@@ -54,7 +54,7 @@ export const algebraicToCoords = (square: string): [number, number] => {
   const file = square.charCodeAt(0) - 97; // a=0, h=7
   const rankChar = square.charAt(1);
   if (!rankChar) throw new Error(`Invalid square format: ${square}`);
-  const rank = 8 - parseInt(rankChar);
+  const rank = 8 - parseInt(rankChar, 10);
   return [rank, file];
 };
 
@@ -145,5 +145,6 @@ export const formatMoveAsNotation = (
     return to; // Pawns don't include piece letter
   }
 
+  // biome-ignore lint/style/noNonNullAssertion: pieceName is guaranteed non-empty string
   return `${pieceName[0]!}${from}${to}`;
 };

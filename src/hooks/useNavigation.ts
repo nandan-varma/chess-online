@@ -5,7 +5,7 @@
 
 import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useCallback } from 'react';
-import { getRouteMetadata, generateBreadcrumbs } from '@/lib/navigation';
+import { generateBreadcrumbs, getRouteMetadata } from '@/lib/navigation';
 
 /**
  * useNavigation hook - Manage navigation state and utilities

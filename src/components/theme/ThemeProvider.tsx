@@ -9,6 +9,7 @@ import type React from 'react';
 import {
   createContext,
   type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -29,6 +30,24 @@ interface ThemeProviderProps {
   defaultTheme?: Theme;
 }
 
+function getEffectiveTheme(t: Theme): 'light' | 'dark' {
+  if (t === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+  return t as 'light' | 'dark';
+}
+
+function applyThemeToDOM(t: Theme) {
+  const root = document.documentElement;
+  if (getEffectiveTheme(t) === 'dark') {
+    root.classList.add('dark');
+  } else {
+    root.classList.remove('dark');
+  }
+}
+
 /**
  * Theme Provider Component
  */
@@ -39,34 +58,17 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [mounted, setMounted] = useState(false);
 
-  // Get effective theme (resolve 'system' preference)
-  const getEffectiveTheme = (t: Theme): 'light' | 'dark' => {
-    if (t === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light';
-    }
-    return t as 'light' | 'dark';
-  };
-
   const effectiveTheme = getEffectiveTheme(theme);
   const isDark = effectiveTheme === 'dark';
+
+  const applyTheme = useCallback((t: Theme) => {
+    applyThemeToDOM(t);
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem('theme', newTheme);
     applyTheme(newTheme);
-  };
-
-  const applyTheme = (t: Theme) => {
-    const effective = getEffectiveTheme(t);
-    const root = document.documentElement;
-
-    if (effective === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
   };
 
   // Load theme from localStorage on mount
@@ -75,7 +77,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     setThemeState(savedTheme);
     applyTheme(savedTheme);
     setMounted(true);
-  }, []);
+  }, [applyTheme, defaultTheme]);
 
   // Listen for system theme changes
   useEffect(() => {
@@ -86,7 +88,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, [theme, applyTheme]);
 
   // Prevent flash of wrong theme
   if (!mounted) {

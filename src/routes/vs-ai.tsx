@@ -218,7 +218,7 @@ function VsAIGame() {
     game.reset();
     setFen(game.fen());
     setEngine(new Game());
-  }, [game, engine]);
+  }, [game]);
 
   /**
    * Undo last move
@@ -235,7 +235,7 @@ function VsAIGame() {
       setFen(game.fen());
       setEngine(new Game(game.fen()));
     }
-  }, [game, engine]);
+  }, [game]);
 
   /**
    * Redo last move
@@ -248,7 +248,7 @@ function VsAIGame() {
       setEngine(new Game(game.fen()));
       setUndoneMove(null);
     }
-  }, [undoneMove, isValidMove, game, engine]);
+  }, [undoneMove, isValidMove, game]);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
