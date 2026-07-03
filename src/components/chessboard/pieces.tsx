@@ -22,7 +22,10 @@ const piecesSVG: Record<Piece, string> = {
 };
 
 export function PieceIcon({ piece, size }: PieceIconProps): React.ReactElement {
-  const svg = piecesSVG[piece];
+  const svg = piecesSVG[piece].replace(
+    '<svg ',
+    `<svg width="${size}" height="${size}" `
+  );
 
   return (
     <div
