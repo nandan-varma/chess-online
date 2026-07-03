@@ -1,23 +1,3 @@
-/**
- * Custom hooks export - React hooks for component use
- */
-
+export { useAuthState } from '@/components/providers/auth';
 export { useTheme } from '@/components/theme/ThemeProvider';
-export { useAsync } from './useAsync';
-export {
-  useCurrentUser,
-  useLogin,
-  useLogout,
-  useSignup,
-  useUpdateProfile,
-} from './useAuth';
-export { useDebounce, useDebouncedCallback } from './useDebounce';
-export {
-  useCreateGame,
-  useGame,
-  useMakeMove,
-  useResignGame,
-  useUndoMove,
-} from './useGame';
 export { useNavigation } from './useNavigation';
-export { useNotification } from './useNotification';

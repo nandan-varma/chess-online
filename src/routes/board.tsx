@@ -3,8 +3,6 @@
  * Two-player chess game on the same device
  */
 
-'use client';
-
 import {
   faRotate,
   faRotateLeft,
@@ -12,13 +10,13 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { createFileRoute } from '@tanstack/react-router';
-import type { Square } from 'chess.js';
+import type { Move, Square } from 'chess.js';
 import { Chess } from 'chess.js';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import Chessboard from '@/components/chessboard';
 import { Button } from '@/components/ui/button';
-import type { ChessMove, SquareStyles, VerboseMove } from '@/types';
+import type { ChessMove, SquareStyles } from '@/types';
 
 /**
  * Route configuration
@@ -114,7 +112,7 @@ function LocalBoard() {
    */
   const onMouseOverSquare = useCallback(
     (square: Square): void => {
-      const moves: VerboseMove[] = game.moves({ square, verbose: true });
+      const moves: Move[] = game.moves({ square, verbose: true });
 
       if (moves.length === 0) return;
 
@@ -125,7 +123,7 @@ function LocalBoard() {
         borderRadius: '50%',
       };
 
-      moves.forEach((move: VerboseMove) => {
+      moves.forEach((move: Move) => {
         newStyles[move.to] = {
           background:
             'radial-gradient(circle, rgba(0,0,0,0.2) 36%, transparent 40%)',

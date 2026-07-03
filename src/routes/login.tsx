@@ -3,8 +3,6 @@
  * User authentication with email and password
  */
 
-'use client';
-
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useCallback, useState } from 'react';

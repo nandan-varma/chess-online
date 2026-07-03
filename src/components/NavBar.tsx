@@ -1,14 +1,5 @@
-/**
- * Enhanced Navigation Bar component
- * Displays navigation with breadcrumbs, back button, and user menu
- * Uses brand colors and design system components throughout
- */
-
-'use client';
-
 import { Link, useNavigate } from '@tanstack/react-router';
-import type { User } from 'firebase/auth';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
 import {
   ArrowLeft,
   ChevronRight,
@@ -20,7 +11,7 @@ import {
   Zap,
 } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -32,11 +23,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useNavigation } from '@/hooks/useNavigation';
 import { auth } from '@/lib/firebase';
+import { useAuthState } from './providers/auth';
 
-/**
- * Navigation breadcrumb component
- * Shows navigation hierarchy with brand styling
- */
 function Breadcrumbs({
   items,
 }: {
@@ -61,29 +49,12 @@ function Breadcrumbs({
   );
 }
 
-/**
- * Enhanced navigation bar component
- * Uses brand colors and design system components throughout
- */
 const NavBar: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuthState();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { currentPath, metadata, breadcrumbs, goBack } = useNavigation();
-
-  // Track auth state
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsLoading(false);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -96,15 +67,11 @@ const NavBar: React.FC = () => {
 
   const showBackButton = metadata.showBackButton && currentPath !== '/';
   const isAuthPage = currentPath === '/login' || currentPath === '/signup';
-  const _isGamePage =
-    currentPath.startsWith('/board') || currentPath.startsWith('/vs-ai');
 
   return (
     <nav className="sticky top-0 z-40 w-full bg-gradient-to-r from-background to-background/95 border-b border-border/50 shadow-card backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Main nav row */}
         <div className="flex h-16 items-center justify-between gap-4">
-          {/* Left section - Logo and back button */}
           <div className="flex items-center gap-3 min-w-0">
             {showBackButton && (
               <Button
@@ -131,60 +98,51 @@ const NavBar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Center section - Breadcrumbs (desktop only) */}
           {!isAuthPage && breadcrumbs.length > 1 && (
             <div className="hidden md:flex flex-1 justify-center px-4">
               <Breadcrumbs items={breadcrumbs} />
             </div>
           )}
 
-          {/* Right section - Auth and menu */}
-          {!isLoading && (
+          {!loading && (
             <>
-              {/* Desktop menu */}
               <div className="hidden md:flex items-center gap-2">
                 {user ? (
-                  <>
-                    {/* User menu */}
-                    <DropdownMenu
-                      open={isMenuOpen}
-                      onOpenChange={setIsMenuOpen}
-                    >
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                        >
-                          <div className="p-1 rounded-md bg-primary/10 text-primary">
-                            <UserIcon className="h-4 w-4" />
-                          </div>
-                          <span className="max-w-[150px] truncate text-sm hidden sm:inline">
-                            {user.email}
-                          </span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="w-56 shadow-3d-lg border-border/50"
+                  <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10"
                       >
-                        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-                          Signed in as
-                        </DropdownMenuLabel>
-                        <DropdownMenuLabel className="text-sm font-semibold text-primary truncate">
+                        <div className="p-1 rounded-md bg-primary/10 text-primary">
+                          <UserIcon className="h-4 w-4" />
+                        </div>
+                        <span className="max-w-[150px] truncate text-sm hidden sm:inline">
                           {user.email}
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuItem
-                          onClick={handleLogout}
-                          className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5"
-                        >
-                          <LogOut className="mr-2 h-4 w-4" />
-                          <span>Log out</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
+                        </span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-56 shadow-3d-lg border-border/50"
+                    >
+                      <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+                        Signed in as
+                      </DropdownMenuLabel>
+                      <DropdownMenuLabel className="text-sm font-semibold text-primary truncate">
+                        {user.email}
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-border/50" />
+                      <DropdownMenuItem
+                        onClick={handleLogout}
+                        className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
                   <div className="flex items-center gap-2">
                     <Link to="/login">
@@ -209,7 +167,6 @@ const NavBar: React.FC = () => {
                 )}
               </div>
 
-              {/* Mobile menu */}
               <div className="md:hidden">
                 <DropdownMenu
                   open={isMobileMenuOpen}
@@ -236,7 +193,6 @@ const NavBar: React.FC = () => {
                         <DropdownMenuLabel className="text-sm font-semibold text-primary truncate">
                           {user.email}
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-border/50" />
                         <DropdownMenuSeparator className="bg-border/50" />
                         <DropdownMenuItem
                           onClick={handleLogout}
@@ -282,7 +238,6 @@ const NavBar: React.FC = () => {
           )}
         </div>
 
-        {/* Page title row (mobile only) */}
         <div className="md:hidden -mx-4 px-4 py-3 border-t border-border/50 bg-primary/5">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10 text-primary flex-shrink-0">
