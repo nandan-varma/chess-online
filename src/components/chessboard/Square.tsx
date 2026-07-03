@@ -106,15 +106,9 @@ function SquareComponent({
   };
 
   return (
-    <button
-      type="button"
-      style={{
-        ...baseSquareStyle,
-        border: 'none',
-        padding: 0,
-        outline: 'none',
-        fontFamily: 'inherit',
-      }}
+    // biome-ignore lint/a11y/useSemanticElements: chessboard squares use CSS grid, not HTML table
+    <div
+      style={baseSquareStyle}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       onContextMenu={handleContextMenu}
@@ -125,7 +119,9 @@ function SquareComponent({
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       data-square={square}
+      role="gridcell"
       aria-label={`${square}${piece ? `, ${piece}` : ''}`}
+      tabIndex={0}
     >
       {/* Overlay for move indicators */}
       {squareStyle && <div style={overlayStyle} />}
@@ -160,7 +156,7 @@ function SquareComponent({
           <PieceIcon piece={piece} size={squareSize * 0.85} />
         </div>
       )}
-    </button>
+    </div>
   );
 }
 
