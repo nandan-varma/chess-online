@@ -37,7 +37,6 @@ export const useNotification = () => {
         return sonnerToast.error(message, baseOptions);
       case 'warning':
         return sonnerToast.warning(message, baseOptions);
-      case 'info':
       default:
         return sonnerToast.message(message, baseOptions);
     }

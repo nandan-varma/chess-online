@@ -19,5 +19,5 @@ export {
   useResignGame,
   useUndoMove,
 } from './useGame';
-export { useNotification } from './useNotification';
 export { useNavigation } from './useNavigation';
+export { useNotification } from './useNotification';

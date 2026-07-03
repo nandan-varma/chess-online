@@ -37,7 +37,7 @@ function HomeClientCard() {
 
   useEffect(() => {
     // Generate URL only on client side
-    setFriendUrl('/' + generateRandomId());
+    setFriendUrl(`/${generateRandomId()}`);
     setIsHydrated(true);
   }, []);
 

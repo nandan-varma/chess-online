@@ -53,7 +53,8 @@ export const useAsync = <T>(
     return () => {
       isMountedRef.current = false;
     };
-  }, options.dependencies || []);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: dynamic deps array is intentional API
+  }, options.dependencies ?? []);
 
   return { ...state, retry: execute };
 };

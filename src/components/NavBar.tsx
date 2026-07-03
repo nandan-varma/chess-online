@@ -12,10 +12,10 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import {
   ArrowLeft,
   ChevronRight,
+  Gamepad2,
   Home,
   LogOut,
   Menu,
-  Gamepad2,
   User as UserIcon,
   Zap,
 } from 'lucide-react';
@@ -30,8 +30,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { auth } from '@/lib/firebase';
 import { useNavigation } from '@/hooks/useNavigation';
+import { auth } from '@/lib/firebase';
 
 /**
  * Navigation breadcrumb component
@@ -96,7 +96,8 @@ const NavBar: React.FC = () => {
 
   const showBackButton = metadata.showBackButton && currentPath !== '/';
   const isAuthPage = currentPath === '/login' || currentPath === '/signup';
-  const isGamePage = currentPath.startsWith('/board') || currentPath.startsWith('/vs-ai');
+  const _isGamePage =
+    currentPath.startsWith('/board') || currentPath.startsWith('/vs-ai');
 
   return (
     <nav className="sticky top-0 z-40 w-full bg-gradient-to-r from-background to-background/95 border-b border-border/50 shadow-card backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -117,10 +118,7 @@ const NavBar: React.FC = () => {
               </Button>
             )}
 
-            <Link
-              to="/"
-              className="flex items-center gap-2 shrink-0 group"
-            >
+            <Link to="/" className="flex items-center gap-2 shrink-0 group">
               <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-3d-sm group-hover:shadow-3d transition-all duration-200 active:shadow-sm">
                 <Gamepad2 className="h-5 w-5" />
               </div>
@@ -147,7 +145,6 @@ const NavBar: React.FC = () => {
               <div className="hidden md:flex items-center gap-2">
                 {user ? (
                   <>
-
                     {/* User menu */}
                     <DropdownMenu
                       open={isMenuOpen}
@@ -167,7 +164,10 @@ const NavBar: React.FC = () => {
                           </span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-56 shadow-3d-lg border-border/50">
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-56 shadow-3d-lg border-border/50"
+                      >
                         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                           Signed in as
                         </DropdownMenuLabel>
@@ -175,7 +175,10 @@ const NavBar: React.FC = () => {
                           {user.email}
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5">
+                        <DropdownMenuItem
+                          onClick={handleLogout}
+                          className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5"
+                        >
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Log out</span>
                         </DropdownMenuItem>
@@ -185,12 +188,19 @@ const NavBar: React.FC = () => {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Link to="/login">
-                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary hover:bg-primary/10">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+                      >
                         Log In
                       </Button>
                     </Link>
                     <Link to="/signup">
-                      <Button size="sm" className="gap-1.5 shadow-3d-sm hover:shadow-sm">
+                      <Button
+                        size="sm"
+                        className="gap-1.5 shadow-3d-sm hover:shadow-sm"
+                      >
                         <Zap className="h-4 w-4" />
                         <span>Sign Up</span>
                       </Button>
@@ -214,7 +224,10 @@ const NavBar: React.FC = () => {
                       <Menu className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 shadow-3d-lg border-border/50">
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 shadow-3d-lg border-border/50"
+                  >
                     {user ? (
                       <>
                         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
@@ -225,7 +238,10 @@ const NavBar: React.FC = () => {
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-border/50" />
                         <DropdownMenuSeparator className="bg-border/50" />
-                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5">
+                        <DropdownMenuItem
+                          onClick={handleLogout}
+                          className="cursor-pointer text-destructive hover:text-destructive hover:bg-destructive/5"
+                        >
                           <LogOut className="mr-2 h-4 w-4" />
                           <span>Log out</span>
                         </DropdownMenuItem>
@@ -236,14 +252,23 @@ const NavBar: React.FC = () => {
                           <UserIcon className="h-3 w-3" />
                           ACCOUNT
                         </DropdownMenuLabel>
-                        <DropdownMenuItem asChild className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5">
+                        <DropdownMenuItem
+                          asChild
+                          className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5"
+                        >
                           <Link to="/login" className="flex items-center gap-2">
                             <Home className="h-3.5 w-3.5" />
                             Log In
                           </Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem asChild className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5">
-                          <Link to="/signup" className="flex items-center gap-2">
+                        <DropdownMenuItem
+                          asChild
+                          className="cursor-pointer text-muted-foreground hover:text-primary hover:bg-primary/5"
+                        >
+                          <Link
+                            to="/signup"
+                            className="flex items-center gap-2"
+                          >
                             <Zap className="h-3.5 w-3.5" />
                             Sign Up
                           </Link>

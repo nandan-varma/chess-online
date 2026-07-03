@@ -63,7 +63,11 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
  */
 export function getRouteMetadata(path: string): RouteMetadata {
   // Handle dynamic routes like /game-id
-  if (path.startsWith('/') && path !== '/' && !Object.keys(ROUTE_METADATA).includes(path)) {
+  if (
+    path.startsWith('/') &&
+    path !== '/' &&
+    !Object.keys(ROUTE_METADATA).includes(path)
+  ) {
     return {
       title: 'Multiplayer Game',
       description: 'Play with a friend online',
@@ -103,7 +107,9 @@ export function getGameRoutes() {
 /**
  * Parse pathname to get breadcrumb items
  */
-export function generateBreadcrumbs(pathname: string): Array<{ label: string; href: string }> {
+export function generateBreadcrumbs(
+  pathname: string
+): Array<{ label: string; href: string }> {
   if (pathname === '/') {
     return [{ label: 'Home', href: '/' }];
   }
