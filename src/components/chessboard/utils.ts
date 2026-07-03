@@ -62,19 +62,3 @@ export function isLightSquare(square: Square): boolean {
   const rank = Number.parseInt(square[1] ?? '1', 10) - 1;
   return (file + rank) % 2 !== 0;
 }
-
-/**
- * Convert square to coordinates
- */
-export function squareToCoords(square: Square): { file: number; rank: number } {
-  const file = square.charCodeAt(0) - 97;
-  const rank = Number.parseInt(square[1] ?? '1', 10) - 1;
-  return { file, rank };
-}
-
-/**
- * Convert coordinates to square
- */
-export function coordsToSquare(file: number, rank: number): Square {
-  return `${FILES[file]}${rank + 1}` as Square;
-}

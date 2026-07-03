@@ -64,16 +64,6 @@ function Chessboard({
   // Get all squares in correct order
   const squares = useMemo(() => getSquares(orientation), [orientation]);
 
-  // Handle drag start
-  const handleDragStart = useCallback(() => {
-    // Drag start handler - can be used for visual feedback if needed
-  }, []);
-
-  // Handle drag over
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-  }, []);
-
   // Handle drop
   const handleDrop = useCallback(
     (e: React.DragEvent, targetSquare: Square) => {
@@ -167,8 +157,6 @@ function Chessboard({
               onSquareRightClick={onSquareRightClick}
               onMouseOver={onMouseOverSquare}
               onMouseOut={onMouseOutSquare}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
               onDrop={handleDrop}
               draggable={draggable}
             />

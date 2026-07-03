@@ -49,8 +49,6 @@ export interface SquareComponentProps {
   onSquareRightClick?: (square: Square) => void;
   onMouseOver?: (square: Square) => void;
   onMouseOut?: (square: Square) => void;
-  onDragStart?: (square?: Square, piece?: Piece) => void;
-  onDragOver?: (e: React.DragEvent, square: Square) => void;
   onDrop?: (e: React.DragEvent, square: Square) => void;
   draggable?: boolean;
 }

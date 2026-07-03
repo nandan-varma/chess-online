@@ -14,8 +14,6 @@ function SquareComponent({
   onSquareRightClick,
   onMouseOver,
   onMouseOut,
-  onDragStart,
-  onDragOver,
   onDrop,
   draggable = true,
 }: SquareComponentProps): React.ReactElement {
@@ -87,17 +85,15 @@ function SquareComponent({
   };
 
   const handleDragStart = (e: React.DragEvent) => {
-    if (piece && draggable && onDragStart) {
+    if (piece && draggable) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', square);
-      onDragStart();
     }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    onDragOver?.(e, square);
   };
 
   const handleDrop = (e: React.DragEvent) => {

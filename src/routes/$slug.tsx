@@ -1,17 +1,8 @@
-/**
- * Multiplayer chess game page
- * Real-time game using Firebase with dynamic game ID
- */
-
-'use client';
-
 import { faRotate } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import type { Square } from 'chess.js';
 import { Chess } from 'chess.js';
-import type { User } from 'firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
 import {
   type DatabaseReference,
   type DataSnapshot,
@@ -26,20 +17,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import CopyToClipboard from '@/components/CopyToClipboard';
 import Chessboard from '@/components/chessboard';
+import { useAuthState } from '@/components/providers/auth';
 import { Button } from '@/components/ui/button';
-import { auth, database } from '@/lib/firebase';
+import { database } from '@/lib/firebase';
 import type { ChessMove, GameData, PlayerColor, SquareStyles } from '@/types';
 
-/**
- * Route configuration with path parameter
- */
 export const Route = createFileRoute('/$slug')({
   component: MultiplayerGame,
   head: () => ({
     meta: [
-      {
-        title: 'Online Multiplayer - Chess Online',
-      },
+      { title: 'Online Multiplayer - Chess Online' },
       {
         name: 'description',
         content: 'Play chess online with friends in real-time.',
@@ -48,12 +35,11 @@ export const Route = createFileRoute('/$slug')({
   }),
 });
 
-/**
- * Multiplayer game component
- */
 function MultiplayerGame() {
   const navigate = useNavigate();
   const { slug } = Route.useParams();
+  const { user, loading } = useAuthState();
+  const userId = user?.uid ?? null;
 
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [fen, setFen] = useState(
@@ -61,54 +47,40 @@ function MultiplayerGame() {
   );
   const [squareStyles, setSquareStyles] = useState<SquareStyles>({});
   const [color, setColor] = useState<PlayerColor>('w');
-  const [userId, setUserId] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const gameRef = useRef(new Chess());
   const gameDbRef = useRef<DatabaseReference | null>(null);
-
-  /**
-   * Initialize authentication
-   */
+  // Ref so the Firebase listener always sees the latest fen without re-subscribing
+  const fenRef = useRef(fen);
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user: User | null) => {
-      if (user) {
-        setUserId(user.uid);
-        setIsLoading(false);
-      } else {
-        toast.error('Please log in to play with friends.');
-        navigate({ to: '/login' });
-      }
-    });
+    fenRef.current = fen;
+  }, [fen]);
 
-    return () => {
-      unsubscribe();
-    };
-  }, [navigate]);
+  // Redirect unauthenticated users
+  useEffect(() => {
+    if (!loading && !user) {
+      toast.error('Please log in to play with friends.');
+      navigate({ to: '/login' });
+    }
+  }, [loading, user, navigate]);
 
-  /**
-   * Initialize game data from Firebase
-   */
+  // Initialize game from Firebase
   useEffect(() => {
     if (!slug || !userId || isInitialized) return;
 
     const initializeGame = async () => {
       try {
         gameDbRef.current = ref(database, `games/${slug}`);
-
         const snapshot = await get(gameDbRef.current);
 
         if (snapshot.exists()) {
           const data = snapshot.val() as GameData;
           setGameData(data);
-
           if (data.FEN) {
             gameRef.current.load(data.FEN);
             setFen(data.FEN);
           }
-
-          // Determine player color
           if (data.createdBy === userId) {
             setColor('w');
           } else {
@@ -119,7 +91,6 @@ function MultiplayerGame() {
             }
           }
         } else {
-          // Create new game
           const newGame: GameData = {
             id: slug,
             FEN: gameRef.current.fen(),
@@ -143,36 +114,26 @@ function MultiplayerGame() {
     initializeGame();
   }, [slug, userId, isInitialized, navigate]);
 
-  /**
-   * Listen for game state changes in Firebase
-   */
+  // Subscribe to real-time updates — stable, no fen in deps
   useEffect(() => {
     if (!gameDbRef.current || !isInitialized) return;
 
     const handleValueChange = (snapshot: DataSnapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val() as GameData;
-        setGameData(data);
-
-        if (data.FEN && data.FEN !== fen) {
-          gameRef.current.load(data.FEN);
-          setFen(data.FEN);
-        }
+      if (!snapshot.exists()) return;
+      const data = snapshot.val() as GameData;
+      setGameData(data);
+      if (data.FEN && data.FEN !== fenRef.current) {
+        gameRef.current.load(data.FEN);
+        setFen(data.FEN);
       }
     };
 
     onValue(gameDbRef.current, handleValueChange);
-
     return () => {
-      if (gameDbRef.current) {
-        off(gameDbRef.current);
-      }
+      if (gameDbRef.current) off(gameDbRef.current);
     };
-  }, [isInitialized, fen]);
+  }, [isInitialized]);
 
-  /**
-   * Handle move
-   */
   const handleMove = useCallback(
     (move: ChessMove) => {
       if (gameRef.current.turn() !== color) {
@@ -180,14 +141,9 @@ function MultiplayerGame() {
         return;
       }
 
-      const moves = gameRef.current.moves({
-        square: move.from as Square,
-        verbose: true,
-      });
-
-      const isValidMove = moves.some(
-        (m) => m.to === move.to && m.from === move.from
-      );
+      const isValidMove = gameRef.current
+        .moves({ square: move.from as Square, verbose: true })
+        .some((m) => m.to === move.to && m.from === move.from);
 
       if (!isValidMove) {
         toast.error('Invalid move! Please make a valid move.');
@@ -200,24 +156,16 @@ function MultiplayerGame() {
         const newFen = gameRef.current.fen();
         setFen(newFen);
 
-        // Update Firebase
         if (gameDbRef.current && gameData) {
-          const updatedGame: GameData = {
-            ...gameData,
-            FEN: newFen,
-          };
-          set(gameDbRef.current, updatedGame);
+          set(gameDbRef.current, { ...gameData, FEN: newFen });
         }
 
-        // Check game state
         if (gameRef.current.isCheckmate()) {
           toast.success('Checkmate! You won!', {
             description: 'The game is over.',
           });
         } else if (gameRef.current.isDraw()) {
-          toast.info('Draw!', {
-            description: 'The game is a draw.',
-          });
+          toast.info('Draw!', { description: 'The game is a draw.' });
         } else if (gameRef.current.isCheck()) {
           toast.warning('Check!');
         }
@@ -229,16 +177,12 @@ function MultiplayerGame() {
     [color, gameData]
   );
 
-  /**
-   * Handle pawn promotion
-   */
   const handlePromotion = useCallback(
     (sourceSquare: string, targetSquare: string) => {
       const promotionPiece = prompt(
         'Choose a promotion piece (queen: q, rook: r, bishop: b, knight: n)',
         'q'
       );
-
       handleMove({
         from: sourceSquare,
         to: targetSquare,
@@ -248,20 +192,14 @@ function MultiplayerGame() {
     [handleMove]
   );
 
-  /**
-   * Show available moves on square hover
-   */
   const onMouseOverSquare = useCallback(
     (square: string) => {
       if (gameRef.current.turn() !== color) return;
-
       const moves = gameRef.current.moves({
         square: square as Square,
         verbose: true,
       });
-
       if (moves.length === 0) return;
-
       const newStyles: SquareStyles = {
         [square]: {
           background:
@@ -269,48 +207,31 @@ function MultiplayerGame() {
           borderRadius: '50%',
         },
       };
-
-      moves.forEach((move) => {
+      for (const move of moves) {
         newStyles[move.to] = {
           background:
             'radial-gradient(circle, rgba(0,0,0,0.2) 36%, transparent 40%)',
           borderRadius: '50%',
         };
-      });
-
+      }
       setSquareStyles(newStyles);
     },
     [color]
   );
 
-  /**
-   * Clear square styles on mouse out
-   */
-  const onMouseOutSquare = useCallback(() => {
-    setSquareStyles({});
-  }, []);
+  const onMouseOutSquare = useCallback(() => setSquareStyles({}), []);
 
-  /**
-   * Reset game
-   */
   const handleResetClick = useCallback(() => {
     if (!gameDbRef.current || !gameData) return;
-
     setSquareStyles({});
     gameRef.current.reset();
     const newFen = gameRef.current.fen();
     setFen(newFen);
-
-    const updatedGame: GameData = {
-      ...gameData,
-      FEN: newFen,
-    };
-
-    set(gameDbRef.current, updatedGame);
+    set(gameDbRef.current, { ...gameData, FEN: newFen });
     toast.info('Game has been reset');
   }, [gameData]);
 
-  if (isLoading || !userId || !isInitialized) {
+  if (loading || !userId || !isInitialized) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
@@ -354,14 +275,10 @@ function MultiplayerGame() {
                   move.targetSquare[1] === '8') ||
                   (move.sourceSquare[1] === '2' &&
                     move.targetSquare[1] === '1'));
-
               if (isPromotion) {
                 handlePromotion(move.sourceSquare, move.targetSquare);
               } else {
-                handleMove({
-                  from: move.sourceSquare,
-                  to: move.targetSquare,
-                });
+                handleMove({ from: move.sourceSquare, to: move.targetSquare });
               }
             }}
           />

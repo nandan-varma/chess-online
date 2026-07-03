@@ -3,8 +3,6 @@
  * Handles generation of random game IDs for multiplayer play
  */
 
-'use client';
-
 import { Link } from '@tanstack/react-router';
 import { Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -24,7 +22,7 @@ function generateRandomId(): string {
   return Math.random()
     .toString(36)
     .replace(/[^a-z]+/g, '')
-    .substr(2, 10);
+    .slice(2, 12);
 }
 
 /**

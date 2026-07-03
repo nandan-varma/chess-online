@@ -1,16 +1,3 @@
-/**
- * Navigation utilities and configuration
- * Provides helper functions and route metadata for navigation
- */
-
-export const NAVIGATION_ROUTES = {
-  HOME: '/',
-  LOGIN: '/login',
-  SIGNUP: '/signup',
-  BOARD: '/board',
-  VS_AI: '/vs-ai',
-} as const;
-
 export interface RouteMetadata {
   title: string;
   description?: string;
@@ -19,15 +6,8 @@ export interface RouteMetadata {
   category?: 'auth' | 'game' | 'home';
 }
 
-/**
- * Route metadata for breadcrumbs and navigation
- */
-export const ROUTE_METADATA: Record<string, RouteMetadata> = {
-  '/': {
-    title: 'Home',
-    description: 'Play chess online',
-    category: 'home',
-  },
+const ROUTE_METADATA: Record<string, RouteMetadata> = {
+  '/': { title: 'Home', description: 'Play chess online', category: 'home' },
   '/login': {
     title: 'Log In',
     description: 'Sign in to your account',
@@ -58,16 +38,9 @@ export const ROUTE_METADATA: Record<string, RouteMetadata> = {
   },
 };
 
-/**
- * Get route metadata for a given path
- */
 export function getRouteMetadata(path: string): RouteMetadata {
-  // Handle dynamic routes like /game-id
-  if (
-    path.startsWith('/') &&
-    path !== '/' &&
-    !Object.keys(ROUTE_METADATA).includes(path)
-  ) {
+  if (ROUTE_METADATA[path]) return ROUTE_METADATA[path];
+  if (path !== '/') {
     return {
       title: 'Multiplayer Game',
       description: 'Play with a friend online',
@@ -76,55 +49,24 @@ export function getRouteMetadata(path: string): RouteMetadata {
       category: 'game',
     };
   }
-
-  return (
-    ROUTE_METADATA[path] || {
-      title: 'Chess Online',
-      showBackButton: true,
-      backRoute: '/',
-    }
-  );
+  return { title: 'Chess Online', showBackButton: true, backRoute: '/' };
 }
 
-/**
- * Get game routes for authenticated users
- */
-export function getGameRoutes() {
-  return [
-    {
-      label: 'Local Game',
-      to: NAVIGATION_ROUTES.BOARD,
-      description: 'Play with a friend on same device',
-    },
-    {
-      label: 'Play AI',
-      to: NAVIGATION_ROUTES.VS_AI,
-      description: 'Challenge the computer',
-    },
-  ];
-}
-
-/**
- * Parse pathname to get breadcrumb items
- */
 export function generateBreadcrumbs(
   pathname: string
 ): Array<{ label: string; href: string }> {
-  if (pathname === '/') {
-    return [{ label: 'Home', href: '/' }];
-  }
+  if (pathname === '/') return [{ label: 'Home', href: '/' }];
 
-  const segments = pathname.split('/').filter(Boolean);
   const breadcrumbs: Array<{ label: string; href: string }> = [
     { label: 'Home', href: '/' },
   ];
-
   let currentPath = '';
-  for (const segment of segments) {
+  for (const segment of pathname.split('/').filter(Boolean)) {
     currentPath += `/${segment}`;
-    const metadata = getRouteMetadata(currentPath);
-    breadcrumbs.push({ label: metadata.title, href: currentPath });
+    breadcrumbs.push({
+      label: getRouteMetadata(currentPath).title,
+      href: currentPath,
+    });
   }
-
   return breadcrumbs;
 }

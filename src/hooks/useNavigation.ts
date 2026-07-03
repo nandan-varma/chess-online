@@ -1,22 +1,17 @@
-/**
- * Navigation hook
- * Provides navigation state and utilities
- */
-
 import { useLocation, useNavigate } from '@tanstack/react-router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { generateBreadcrumbs, getRouteMetadata } from '@/lib/navigation';
 
-/**
- * useNavigation hook - Manage navigation state and utilities
- */
 export function useNavigation() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const currentPath = location.pathname;
-  const metadata = getRouteMetadata(currentPath);
-  const breadcrumbs = generateBreadcrumbs(currentPath);
+
+  const metadata = useMemo(() => getRouteMetadata(currentPath), [currentPath]);
+  const breadcrumbs = useMemo(
+    () => generateBreadcrumbs(currentPath),
+    [currentPath]
+  );
 
   const goBack = useCallback(() => {
     if (metadata.backRoute) {
@@ -26,15 +21,7 @@ export function useNavigation() {
     }
   }, [metadata.backRoute, navigate]);
 
-  const goHome = useCallback(() => {
-    navigate({ to: '/' });
-  }, [navigate]);
+  const goHome = useCallback(() => navigate({ to: '/' }), [navigate]);
 
-  return {
-    currentPath,
-    metadata,
-    breadcrumbs,
-    goBack,
-    goHome,
-  };
+  return { currentPath, metadata, breadcrumbs, goBack, goHome };
 }

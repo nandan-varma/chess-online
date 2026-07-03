@@ -3,8 +3,6 @@
  * User registration with email and password
  */
 
-'use client';
-
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useCallback, useState } from 'react';

@@ -3,8 +3,6 @@
  * Player vs Computer chess game with adjustable difficulty
  */
 
-'use client';
-
 import {
   faRotate,
   faRotateLeft,
@@ -225,11 +223,8 @@ function VsAIGame() {
    */
   const handleUndoClick = useCallback(() => {
     setSquareStyles({});
-
-    game.undo();
-    game.undo();
-
-    const playerMove = game.undo();
+    game.undo(); // undo AI's last response
+    const playerMove = game.undo(); // undo player's move, save for potential redo
     if (playerMove) {
       setUndoneMove(playerMove as ChessMove);
       setFen(game.fen());

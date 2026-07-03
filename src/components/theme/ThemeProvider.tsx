@@ -1,10 +1,3 @@
-/**
- * Theme Provider Component
- * Manages light/dark mode with localStorage persistence
- */
-
-'use client';
-
 import type React from 'react';
 import {
   createContext,
@@ -12,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
@@ -25,90 +19,56 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-interface ThemeProviderProps {
+function applyTheme(t: Theme) {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.classList.toggle(
+    'dark',
+    t === 'dark' || (t === 'system' && prefersDark)
+  );
+}
+
+export const ThemeProvider: React.FC<{
   children: ReactNode;
   defaultTheme?: Theme;
-}
+}> = ({ children, defaultTheme = 'system' }) => {
+  // Read from localStorage on first render (main.tsx already applied FOUC prevention)
+  const [theme, setThemeState] = useState<Theme>(
+    () => (localStorage.getItem('theme') as Theme) || defaultTheme
+  );
 
-function getEffectiveTheme(t: Theme): 'light' | 'dark' {
-  if (t === 'system') {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
-  }
-  return t as 'light' | 'dark';
-}
+  const isDark =
+    theme === 'dark' ||
+    (theme === 'system' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-function applyThemeToDOM(t: Theme) {
-  const root = document.documentElement;
-  if (getEffectiveTheme(t) === 'dark') {
-    root.classList.add('dark');
-  } else {
-    root.classList.remove('dark');
-  }
-}
-
-/**
- * Theme Provider Component
- */
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({
-  children,
-  defaultTheme = 'system',
-}) => {
-  const [theme, setThemeState] = useState<Theme>(defaultTheme);
-  const [mounted, setMounted] = useState(false);
-
-  const effectiveTheme = getEffectiveTheme(theme);
-  const isDark = effectiveTheme === 'dark';
-
-  const applyTheme = useCallback((t: Theme) => {
-    applyThemeToDOM(t);
-  }, []);
-
-  const setTheme = (newTheme: Theme) => {
+  const setTheme = useCallback((newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem('theme', newTheme);
     applyTheme(newTheme);
-  };
+  }, []);
 
-  // Load theme from localStorage on mount
-  useEffect(() => {
-    const savedTheme = (localStorage.getItem('theme') as Theme) || defaultTheme;
-    setThemeState(savedTheme);
-    applyTheme(savedTheme);
-    setMounted(true);
-  }, [applyTheme, defaultTheme]);
-
-  // Listen for system theme changes
+  // Sync DOM when system preference changes while in 'system' mode
   useEffect(() => {
     if (theme !== 'system') return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = () => applyTheme('system');
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, [theme]);
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => applyTheme(theme);
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme, applyTheme]);
-
-  // Prevent flash of wrong theme
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  const value = useMemo(
+    () => ({ theme, setTheme, isDark }),
+    [theme, setTheme, isDark]
+  );
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, isDark }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
   );
 };
 
-/**
- * Hook to use theme context
- */
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
+  if (context === undefined)
     throw new Error('useTheme must be used within ThemeProvider');
-  }
   return context;
 };
