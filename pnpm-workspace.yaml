@@ -8,3 +8,4 @@ overrides:
   seroval: ">=1.6.11"
   source-map-js: ">=1.2.2"
   re2js: ">=2.8.7"
+  "@grpc/grpc-js": ">=1.13.6"
