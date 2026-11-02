@@ -55,29 +55,29 @@ function MyChessGame() {
 
 ### ChessboardProps
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `position` | `string \| Position` | Required | FEN string or position object |
-| `width` | `number` | `560` | Board width in pixels |
-| `orientation` | `'white' \| 'black'` | `'white'` | Which side is at the bottom |
-| `draggable` | `boolean` | `true` | Enable/disable piece dragging |
-| `onDrop` | `(move) => void` | - | Called when a piece is dropped |
-| `onSquareClick` | `(square) => void` | - | Called when a square is clicked |
-| `onSquareRightClick` | `(square) => void` | - | Called on right-click |
-| `onMouseOverSquare` | `(square) => void` | - | Called on mouse hover |
-| `onMouseOutSquare` | `(square) => void` | - | Called when mouse leaves square |
-| `squareStyles` | `Record<string, CSSProperties>` | `{}` | Custom styles per square |
-| `boardStyle` | `CSSProperties` | `{}` | Custom board container style |
-| `lightSquareStyle` | `CSSProperties` | `{}` | Custom light square style |
-| `darkSquareStyle` | `CSSProperties` | `{}` | Custom dark square style |
-| `id` | `string` | `'chessboard'` | DOM id attribute |
+| Prop                 | Type                            | Default        | Description                     |
+| -------------------- | ------------------------------- | -------------- | ------------------------------- |
+| `position`           | `string \| Position`            | Required       | FEN string or position object   |
+| `width`              | `number`                        | `560`          | Board width in pixels           |
+| `orientation`        | `'white' \| 'black'`            | `'white'`      | Which side is at the bottom     |
+| `draggable`          | `boolean`                       | `true`         | Enable/disable piece dragging   |
+| `onDrop`             | `(move) => void`                | -              | Called when a piece is dropped  |
+| `onSquareClick`      | `(square) => void`              | -              | Called when a square is clicked |
+| `onSquareRightClick` | `(square) => void`              | -              | Called on right-click           |
+| `onMouseOverSquare`  | `(square) => void`              | -              | Called on mouse hover           |
+| `onMouseOutSquare`   | `(square) => void`              | -              | Called when mouse leaves square |
+| `squareStyles`       | `Record<string, CSSProperties>` | `{}`           | Custom styles per square        |
+| `boardStyle`         | `CSSProperties`                 | `{}`           | Custom board container style    |
+| `lightSquareStyle`   | `CSSProperties`                 | `{}`           | Custom light square style       |
+| `darkSquareStyle`    | `CSSProperties`                 | `{}`           | Custom dark square style        |
+| `id`                 | `string`                        | `'chessboard'` | DOM id attribute                |
 
 ## Examples
 
 ### Basic Board
 
 ```tsx
-<Chessboard position="start" width={500} />
+<Chessboard position="start" width={500} />;
 ```
 
 ### With Custom Styling
@@ -87,11 +87,11 @@ function MyChessGame() {
   position={fen}
   squareStyles={{
     e4: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
-    d5: { backgroundColor: 'rgba(255, 255, 0, 0.4)' }
+    d5: { backgroundColor: 'rgba(255, 255, 0, 0.4)' },
   }}
   lightSquareStyle={{ backgroundColor: '#f0d9b5' }}
   darkSquareStyle={{ backgroundColor: '#b58863' }}
-/>
+/>;
 ```
 
 ### With Move Validation
@@ -105,14 +105,15 @@ function ChessGame() {
   const highlightSquare = (square: string) => {
     const moves = game.moves({ square, verbose: true });
     const highlights = {};
-    
-    moves.forEach(move => {
+
+    moves.forEach((move) => {
       highlights[move.to] = {
-        background: 'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
-        borderRadius: '50%'
+        background:
+          'radial-gradient(circle, rgba(0,0,0,.1) 25%, transparent 25%)',
+        borderRadius: '50%',
       };
     });
-    
+
     setSquareStyles(highlights);
   };
 
@@ -120,9 +121,9 @@ function ChessGame() {
     const result = game.move({
       from: move.sourceSquare,
       to: move.targetSquare,
-      promotion: 'q'
+      promotion: 'q',
     });
-    
+
     if (result) {
       setFen(game.fen());
       setSquareStyles({});
@@ -161,13 +162,13 @@ You can also pass a position object directly:
 
 ```tsx
 const position = {
-  e4: 'wP',  // white pawn on e4
-  e5: 'bP',  // black pawn on e5
-  e1: 'wK',  // white king on e1
-  e8: 'bK',  // black king on e8
+  e4: 'wP', // white pawn on e4
+  e5: 'bP', // black pawn on e5
+  e1: 'wK', // white king on e1
+  e8: 'bK', // black king on e8
 };
 
-<Chessboard position={position} />
+<Chessboard position={position} />;
 ```
 
 ### Piece Notation
@@ -197,11 +198,11 @@ const position = {
 Full TypeScript support with exported types:
 
 ```tsx
-import { 
-  ChessboardProps, 
-  Position, 
-  Piece, 
-  Square 
+import {
+  ChessboardProps,
+  Position,
+  Piece,
+  Square,
 } from '@/components/chessboard';
 ```
 

@@ -29,7 +29,7 @@ Open http://localhost:3000
 - **UI Components**: Radix UI + custom components
 - **Database**: Firebase Realtime Database - Real-time game synchronization
 - **Authentication**: Firebase Auth - Secure user management
-- **Chess Engine**: 
+- **Chess Engine**:
   - [chess.js](https://github.com/jhlywa/chess.js) - Chess logic and validation
   - [js-chess-engine](https://github.com/bsaleh/js-chess-engine) - AI opponent
 - **Drag & Drop**: react-dnd - Chess piece movement
